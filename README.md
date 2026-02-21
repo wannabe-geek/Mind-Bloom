@@ -12,7 +12,7 @@ MindBloom is a comprehensive mental health and productivity platform built with 
 ## 🛠️ Setup Instructions
 
 ### 1. Prerequisites
-- Python 3.10+
+- Python 3.13+
 - pip
 
 ### 2. Environment Setup

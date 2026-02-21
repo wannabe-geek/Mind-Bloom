@@ -1,0 +1,15 @@
+# Exclude local files from Docker image
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+db.sqlite3
+static/
+staticfiles/
+media/
+.git/
+.vscode/
+venv/
+.idea/
+*.swp
+*.swo
