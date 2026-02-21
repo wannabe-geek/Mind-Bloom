@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: mindbloom
+    env: python
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate"
+    startCommand: "gunicorn MindBloomProject.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: "mindbloom.onrender.com"
+      - key: GEMINI_API_KEY
+        sync: false # Set this in the Render dashboard manually
