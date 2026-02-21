@@ -1,0 +1,69 @@
+﻿{% extends 'base.html' %}
+
+{% block content %}
+<div class="header-action" style="margin-bottom: 40px;">
+    <h1 class="welcome-greeting">Settings</h1>
+    <p class="welcome-subtext">Personalize your Mindbloom experience and select your AI Growth Mentor.</p>
+</div>
+
+<div class="card" style="max-width: 800px; margin: 0 auto; padding: 40px;">
+    <form method="post">
+        {% csrf_token %}
+        <h2 style="margin-bottom: 30px;">Choose Your AI Mentor Persona</h2>
+        <p class="welcome-subtext" style="margin-bottom: 30px;">Your AI Companion will adapt its personality and advice based on your selection.</p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 40px;">
+            <label class="persona-option" style="cursor: pointer;">
+                <input type="radio" name="ai_persona" value="ZEN" {% if user.profile.ai_persona == 'ZEN' %}checked{% endif %} style="display: none;">
+                <div class="card persona-card" style="height: 100%; border: 2px solid #eee; transition: all 0.3s; padding: 25px;">
+                    <div style="font-size: 32px; margin-bottom: 15px;">🧘</div>
+                    <h3 style="margin-bottom: 10px;">Zen Guide</h3>
+                    <p class="welcome-subtext" style="font-size: 13px;">Focuses on mindfulness, breath, and the present moment. Minimalist and calm.</p>
+                </div>
+            </label>
+
+            <label class="persona-option" style="cursor: pointer;">
+                <input type="radio" name="ai_persona" value="STRATEGIST" {% if user.profile.ai_persona == 'STRATEGIST' %}checked{% endif %} style="display: none;">
+                <div class="card persona-card" style="height: 100%; border: 2px solid #eee; transition: all 0.3s; padding: 25px;">
+                    <div style="font-size: 32px; margin-bottom: 15px;">🎯</div>
+                    <h3 style="margin-bottom: 10px;">Practical Strategist</h3>
+                    <p class="welcome-subtext" style="font-size: 13px;">Focuses on actionable steps, energy management, and clear goals. Productive and direct.</p>
+                </div>
+            </label>
+
+            <label class="persona-option" style="cursor: pointer;">
+                <input type="radio" name="ai_persona" value="LISTENER" {% if user.profile.ai_persona == 'LISTENER' %}checked{% endif %} style="display: none;">
+                <div class="card persona-card" style="height: 100%; border: 2px solid #eee; transition: all 0.3s; padding: 25px;">
+                    <div style="font-size: 32px; margin-bottom: 15px;">🤝</div>
+                    <h3 style="margin-bottom: 10px;">Empathetic Listener</h3>
+                    <p class="welcome-subtext" style="font-size: 13px;">Focuses on emotional validation, resonance, and kindness. Supportive and warm.</p>
+                </div>
+            </label>
+
+            <label class="persona-option" style="cursor: pointer;">
+                <input type="radio" name="ai_persona" value="CATALYST" {% if user.profile.ai_persona == 'CATALYST' %}checked{% endif %} style="display: none;">
+                <div class="card persona-card" style="height: 100%; border: 2px solid #eee; transition: all 0.3s; padding: 25px;">
+                    <div style="font-size: 32px; margin-bottom: 15px;">⚡</div>
+                    <h3 style="margin-bottom: 10px;">Growth Catalyst</h3>
+                    <p class="welcome-subtext" style="font-size: 13px;">Focuses on long-term patterns, breakthroughs, and cognitive reframing. Insightful and bold.</p>
+                </div>
+            </label>
+        </div>
+
+        <button type="submit" class="check-in-btn" style="width: 100%; font-size: 16px; padding: 15px;">Save Preferences</button>
+    </form>
+</div>
+
+<style>
+    .persona-option input:checked + .persona-card {
+        border-color: #A0C4FF !important;
+        background-color: #F0F7FF !important;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(160, 196, 255, 0.1);
+    }
+    .persona-card:hover {
+        border-color: #ddd;
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}

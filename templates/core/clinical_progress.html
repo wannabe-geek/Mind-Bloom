@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .trend-bar {
+        width: 100%;
+        border-radius: 4px;
+        min-height: 5px;
+        height: calc(var(--score, 0) * 10px);
+    }
+
+    .mood-bar {
+        background-color: #A0C4FF;
+    }
+
+    .energy-bar {
+        background-color: #BDB2FF;
+    }
+
+    .journal-entry.is-flagged {
+        background-color: #FFF5F5;
+        border-left: 4px solid #E53E3E;
+    }
+
+    .profile-avatar-clinical {
+        width: 80px;
+        height: 80px;
+        font-size: 32px;
+    }
+</style>
+
+<div class="header-action"
+    style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end;">
+    <div>
+        <h1 class="welcome-greeting">Clinical Progress: {{ student.username }}</h1>
+        <p class="welcome-subtext">Comprehensive view of student wellness trends and journal history.</p>
+    </div>
+    <a href="{% url 'dashboard' %}" class="check-in-btn"
+        style="background-color: #E9ECEF; color: #2D3436; text-decoration: none;">Back to Dashboard</a>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+    <!-- Mood Trends Column -->
+    <div>
+        <div class="card" style="margin-bottom: 30px;">
+            <h2 style="margin-bottom: 25px;">Mood & Energy Trends</h2>
+            <div
+                style="height: 300px; display: flex; align-items: flex-end; gap: 10px; padding-bottom: 20px; border-bottom: 2px solid #eee;">
+                {% for entry in mood_history reversed %}
+                <div class="trend-bar-group"
+                    style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                    <div class="trend-bar mood-bar" style="--score: {{ entry.mood_score|default:0 }};"
+                        title="Mood: {{ entry.mood_score }}"></div>
+                    <div class="trend-bar energy-bar" style="--score: {{ entry.energy_score|default:0 }};"
+                        title="Energy: {{ entry.energy_score }}"></div>
+                </div>
+                {% empty %}
+                <p class="welcome-subtext">No mood tracking data available yet.</p>
+                {% endfor %}
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 15px;">
+                <span class="welcome-subtext">Last 30 Checks</span>
+                <div style="display: flex; gap: 20px;">
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <div style="width: 12px; height: 12px; background: #A0C4FF; border-radius: 2px;"></div>
+                        <span class="welcome-subtext" style="font-size: 11px;">Mood</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <div style="width: 12px; height: 12px; background: #BDB2FF; border-radius: 2px;"></div>
+                        <span class="welcome-subtext" style="font-size: 11px;">Energy</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 style="margin-bottom: 25px;">Recent Journaling</h2>
+            {% for journal in journals %}
+            <div class="journal-entry {% if journal.is_flagged %}is-flagged{% endif %}"
+                style="padding: 20px; border-bottom: 1px solid #f0f0f0;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span style="font-weight: 600; font-size: 14px; color: #4A6D6C;">{{ journal.created_at|date:"M d, Y"
+                        }}</span>
+                    {% if journal.is_flagged %}
+                    <span class="profile-tag" style="background-color: #E53E3E; color: white;">CRISIS FLAG</span>
+                    {% endif %}
+                </div>
+                <p style="font-size: 14px; line-height: 1.6; margin-bottom: 15px;">{{ journal.content }}</p>
+                <div style="background-color: #F8F9FA; padding: 15px; border-radius: 12px; font-style: italic;">
+                    <p style="font-size: 13px; color: #666;"><strong>AI Reflection:</strong> {{ journal.ai_reflection }}
+                    </p>
+                </div>
+            </div>
+            {% empty %}
+            <p class="welcome-subtext">No journal entries found for this student.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Student Info Column -->
+    <div>
+        <div class="card" style="text-align: center; padding: 30px;">
+            <div class="profile-avatar"
+                style="margin: 0 auto 20px; width: 80px; height: 80px; font-size: 32px; --avatar-bg: {{ student.profile.avatar_color|default:'#769891' }}; background-color: var(--avatar-bg);">
+                {{ student.profile.get_initial }}
+            </div>
+            <h3 style="margin-bottom: 5px;">{{ student.username }}</h3>
+            <p class="welcome-subtext" style="margin-bottom: 25px;">{{ student.email }}</p>
+
+            <div
+                style="text-align: left; background-color: #F8F9FA; padding: 20px; border-radius: 15px; margin-bottom: 25px;">
+                <h4
+                    style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 10px;">
+                    Connection Details</h4>
+                <p style="font-size: 14px; margin-bottom: 5px;"><strong>Status:</strong> ACTIVE</p>
+                <p style="font-size: 14px;"><strong>Connected since:</strong> {{ student.created_at|date:"M Y" }}</p>
+            </div>
+
+            <a href="{% url 'chat_session' student.id %}" class="check-in-btn"
+                style="display: block; width: 100%; margin-bottom: 10px; text-decoration: none; text-align: center;">Message
+                Student</a>
+            <button class="check-in-btn" style="width: 100%; background-color: #E9ECEF; color: #2D3436;">Add Private
+                Note</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

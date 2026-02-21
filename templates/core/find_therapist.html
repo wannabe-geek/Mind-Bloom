@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="header-action" style="margin-bottom: 40px;">
+    <h1 class="welcome-greeting">Find Therapist</h1>
+    <p class="welcome-subtext">Connect with professionals who can support your journey.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px;">
+    {% for therapist in therapists %}
+    <div class="card card-white" style="text-align: center; padding: 40px 30px;">
+        <div class="profile-avatar"
+            style="margin: 0 auto 20px; --avatar-bg: {{ therapist.profile.avatar_color|default:'#769891' }}; background-color: var(--avatar-bg); width: 80px; height: 80px; font-size: 32px;">
+            {{ therapist.profile.get_initial }}
+        </div>
+        <h3 style="margin-bottom: 5px;">{{ therapist.username }}</h3>
+        <p class="welcome-subtext" style="margin-bottom: 20px;">Professional Therapist</p>
+
+        <div style="margin-bottom: 25px;">
+            {% if therapist.id in connected_ids %}
+            <span class="profile-tag" style="background-color: #C6F6D5; color: #22543D;">CONNECTED</span>
+            {% else %}
+            <span class="profile-tag">AVAILABLE</span>
+            {% endif %}
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to={{ therapist.email }}" target="_blank"
+                class="check-in-btn"
+                style="display: block; width: 100%; font-size: 14px; background-color: #E9ECEF; color: #2D3436;">Email
+                Connect</a>
+
+            {% if therapist.id not in connected_ids %}
+            <form action="{% url 'connect_therapist' therapist.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="check-in-btn" style="display: block; width: 100%; font-size: 14px;">Request
+                    Connection</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 60px;">
+        <h3>No therapists found</h3>
+        <p class="welcome-subtext">Check back soon for available professionals.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

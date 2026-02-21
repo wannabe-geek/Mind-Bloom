@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Engine Monitor - Mindbloom{% endblock %}
+
+{% block content %}
+<div class="welcome-section" style="margin-bottom: 30px;">
+    <h1 class="welcome-greeting">AI Engine Monitor</h1>
+    <p class="welcome-subtext">Cognitive Performance & Persona Analytics</p>
+</div>
+
+<div class="admin-dashboard">
+    <!-- Top Row: AI Stats -->
+    <div class="stat-card-small">
+        <div class="stat-icon" style="background: rgba(159, 122, 234, 0.1); color: #9F7AEA;">🤖</div>
+        <div class="stat-value">{{ total_reflections }}</div>
+        <div class="stat-label">Total Reflections</div>
+    </div>
+    <div class="stat-card-small">
+        <div class="stat-icon" style="background: rgba(236, 110, 173, 0.1); color: #D53F8C;">⚡</div>
+        <div class="stat-value">{{ total_breakthroughs }}</div>
+        <div class="stat-label">Breakthroughs Found</div>
+    </div>
+    <div class="stat-card-small">
+        <div class="stat-icon" style="background: rgba(72, 187, 120, 0.1); color: #48BB78;">📡</div>
+        <div class="stat-value">{{ avg_latency }}</div>
+        <div class="stat-label">Avg Engine Latency</div>
+    </div>
+    <div class="stat-card-small">
+        <div class="stat-icon" style="background: rgba(66, 153, 225, 0.1); color: #4299E1;">🧠</div>
+        <div class="stat-value">99.8%</div>
+        <div class="stat-label">Model Availability</div>
+    </div>
+
+    <!-- Persona Distribution -->
+    <div class="chart-card" style="grid-column: span 2;">
+        <h3 class="chart-title" style="margin-bottom: 20px;">Persona Popularity</h3>
+        <div style="display: flex; gap: 20px; flex-direction: column;">
+            {% for persona, count in active_persona_distribution.items %}
+            <div>
+                <div
+                    style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; font-weight: 600; color: #4A5568;">
+                    <span>{{ persona }}</span>
+                    <span>{{ count }} Users</span>
+                </div>
+                <div style="width: 100%; height: 8px; background: #EDF2F7; border-radius: 4px; overflow: hidden;">
+                    <div
+                        style="width: {{ count|add:count|add:count|add:count|add:count|add:count|add:count|add:count|add:count|add:count }}%; height: 100%; background: #A0C4FF;">
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Health Check -->
+    <div class="chart-card" style="grid-column: span 2;">
+        <h3 class="chart-title" style="margin-bottom: 20px;">Engine Health Log</h3>
+        <div class="timeline-item"
+            style="border-left: 2px solid #C6F6D5; padding-left: 20px; position: relative; margin-bottom: 15px;">
+            <div
+                style="position: absolute; left: -7px; top: 0; width: 12px; height: 12px; background: #48BB78; border-radius: 50%; border: 2px solid white;">
+            </div>
+            <div style="font-weight: 600; font-size: 14px; color: #2F855A;">PERSONA SWITCH SUCCESS</div>
+            <div class="welcome-subtext" style="font-size: 11px;">Zen Guide model re-vectorized successfully.</div>
+            <div style="font-size: 10px; color: #A0AEC0;">15m ago</div>
+        </div>
+        <div class="timeline-item" style="border-left: 2px solid #C6F6D5; padding-left: 20px; position: relative;">
+            <div
+                style="position: absolute; left: -7px; top: 0; width: 12px; height: 12px; background: #48BB78; border-radius: 50%; border: 2px solid white;">
+            </div>
+            <div style="font-weight: 600; font-size: 14px; color: #2F855A;">REFRAMING JOB COMPLETE</div>
+            <div class="welcome-subtext" style="font-size: 11px;">Processed 42 pending insights for active students.
+            </div>
+            <div style="font-size: 10px; color: #A0AEC0;">1h ago</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

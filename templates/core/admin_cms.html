@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Content CMS - Mindbloom{% endblock %}
+
+{% block content %}
+<div class="welcome-section"
+    style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end;">
+    <div>
+        <h1 class="welcome-greeting">Content CMS</h1>
+        <p class="welcome-subtext">Resource Curation & Library Management</p>
+    </div>
+    <button class="check-in-btn" style="margin-bottom: 5px;">+ Add New Resource</button>
+</div>
+
+<div class="admin-dashboard">
+    <div class="stat-card-small" style="flex-direction: row; gap: 15px; align-items: center;">
+        <div
+            style="font-size: 24px; background: #EBF8FF; width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+            📚</div>
+        <div>
+            <div style="font-size: 20px; font-weight: 700;">{{ resources.count }}</div>
+            <div style="font-size: 11px; color: #718096; font-weight: 600;">ACTIVE RESOURCES</div>
+        </div>
+    </div>
+    <div class="stat-card-small" style="flex-direction: row; gap: 15px; align-items: center;">
+        <div
+            style="font-size: 24px; background: #E6FFFA; width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+            🎧</div>
+        <div>
+            <div style="font-size: 20px; font-weight: 700;">12</div>
+            <div style="font-size: 11px; color: #718096; font-weight: 600;">AUDIO TRACKS</div>
+        </div>
+    </div>
+</div>
+
+<div class="card"
+    style="padding: 0; overflow: hidden; border-radius: 20px; border: 1px solid #EDF2F7; margin-top: 24px;">
+    <div style="padding: 20px 24px; border-bottom: 1px solid #EDF2F7; background: #FFF;">
+        <h3 class="chart-title" style="margin: 0;">Resource Library</h3>
+    </div>
+    <table class="admin-table">
+        <thead style="background: #F8FAFC;">
+            <tr>
+                <th>Asset Title</th>
+                <th>Format</th>
+                <th>Domain</th>
+                <th>Engagement</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in resources %}
+            <tr>
+                <td style="font-weight: 600; color: #2D3748;">{{ r.title }}</td>
+                <td>
+                    <span class="profile-tag"
+                        style="background: #EBF8FF; color: #2B6CB0; font-size: 10px; font-weight: 700;">{{
+                        r.resource_type }}</span>
+                </td>
+                <td style="color: #718096; font-size: 13px;">{{ r.category.name|default:"Wellness" }}</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #4A5568;">
+                        <span style="color: #48BB78;">📈</span> 1.2k views
+                    </div>
+                </td>
+                <td>
+                    <button class="check-in-btn"
+                        style="padding: 6px 16px; font-size: 11px; background: #F7FAFC; border: 1px solid #E2E8F0; color: #4A5568;">Curate</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

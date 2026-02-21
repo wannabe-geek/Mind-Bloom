@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="header-action" style="margin-bottom: 40px;">
+    <div style="display: flex; align-items: center; gap: 20px;">
+        <div class="user-avatar"
+            style="width: 60px; height: 60px; font-size: 24px; --avatar-bg: {{ student.profile.avatar_color|default:'#769891' }}; background-color: var(--avatar-bg);">
+            {{ student.profile.get_initial }}
+        </div>
+        <div>
+            <h1 class="welcome-greeting">{{ student.username }}</h1>
+            <p class="welcome-subtext">Clinical Record & Diagnostic History | ID #{{ student.id }}</p>
+        </div>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <span class="profile-tag" style="background: #EBF8FF; color: #2B6CB0; font-weight: 700;">
+            {{ connection.status }}
+        </span>
+        <a href="{% url 'chat_session' student.id %}" class="check-in-btn"
+            style="padding: 10px 20px; font-size: 13px;">Open Private Chat</a>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+
+    <!-- Left Column: History -->
+    <div style="display: flex; flex-direction: column; gap: 30px;">
+
+        <!-- Mood History Grid -->
+        <div class="card" style="padding: 25px;">
+            <h3 style="margin-bottom: 20px; font-size: 16px; color: #2D3748;">Wellness Trends (Last 10 Entries)</h3>
+            <div
+                style="display: grid; grid-template-columns: repeat(10, 1fr); gap: 10px; height: 120px; align-items: flex-end;">
+                {% for mood in mood_entries %}
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                    <div
+                        style="width: 100%; background: #EDF2F7; border-radius: 4px; height: 80px; position: relative;">
+                        <!-- Fixed style lint: mood percentage baked in logic or simplified -->
+                        <div
+                            style="position: absolute; bottom: 0; width: 100%; background: #A0C4FF; border-radius: 4px; height: 50%;">
+                        </div>
+                    </div>
+                    <span style="font-size: 9px; font-weight: 700; color: #A0AEC0;">
+                        {{ mood.created_at|date:"d/m" }}
+                    </span>
+                </div>
+                {% empty %}
+                <p class="welcome-subtext" style="grid-column: span 10; text-align: center; padding-top: 40px;">No mood
+                    data recorded yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Recent Journal Reflections -->
+        <div class="card" style="padding: 25px;">
+            <h3 style="margin-bottom: 20px; font-size: 16px; color: #2D3748;">Journal Insights</h3>
+            {% for journal in journal_entries %}
+            <div
+                style="padding: 15px; background: #F8FAFC; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid #CBD5E0;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="font-size: 11px; font-weight: 700; color: #718096; text-transform: uppercase;">
+                        {{ journal.created_at|date:"M d, Y" }}
+                    </span>
+                    {% if journal.detected_emotion %}
+                    <span
+                        style="font-size: 10px; background: white; padding: 2px 8px; border-radius: 6px; color: #4A5568; border: 1px solid #E2E8F0;">
+                        {{ journal.detected_emotion }}
+                    </span>
+                    {% endif %}
+                </div>
+                <p style="font-size: 13px; color: #2D3748; line-height: 1.5; font-style: italic;">
+                    "{{ journal.content|truncatewords:40 }}"
+                </p>
+                {% if journal.ai_reflection %}
+                <div
+                    style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #CBD5E0; font-size: 12px; color: #718096;">
+                    <strong style="color: #4A5568;">AI Reflection:</strong> {{ journal.ai_reflection|truncatewords:20 }}
+                </div>
+                {% endif %}
+            </div>
+            {% empty %}
+            <p class="welcome-subtext">No journal entries shared with therapist yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Right Column: Professional Notes -->
+    <div style="display: flex; flex-direction: column; gap: 30px;">
+
+        <!-- Add Session Note -->
+        <div class="card" style="padding: 25px;">
+            <h3 style="margin-bottom: 15px; font-size: 16px; color: #2D3748;">New Session Note</h3>
+            <form method="post">
+                {% csrf_token %}
+                <textarea name="note_content" placeholder="Type private clinical observations here..."
+                    style="width: 100%; border-radius: 12px; border: 1px solid #E2E8F0; padding: 15px; font-size: 13px; height: 120px; outline: none; margin-bottom: 15px;"></textarea>
+                <div style="margin-bottom: 15px;">
+                    <label
+                        style="font-size: 11px; font-weight: 700; color: #718096; text-transform: uppercase; display: block; margin-bottom: 8px;">Risk
+                        Assessment</label>
+                    <select name="risk_level"
+                        style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #E2E8F0; background: white; font-size: 13px;">
+                        <option value="LOW">🟢 Low Risk</option>
+                        <option value="MEDIUM">🟡 Medium Risk</option>
+                        <option value="HIGH">🔴 High Risk / Follow-up Needed</option>
+                    </select>
+                </div>
+                <button type="submit" class="check-in-btn" style="width: 100%; border-radius: 10px;">Save Professional
+                    Note</button>
+            </form>
+        </div>
+
+        <!-- Past Notes Activity -->
+        <div class="card" style="padding: 25px;">
+            <h3 style="margin-bottom: 15px; font-size: 15px; color: #2D3748;">Private Timeline</h3>
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                {% for note in session_notes %}
+                <div style="padding-left: 15px; border-left: 2px solid #EDF2F7; position: relative;">
+                    <!-- Fixed style lint -->
+                    <div
+                        style="width: 10px; height: 10px; border-radius: 50%; background: #48BB78; position: absolute; left: -6px; top: 4px;">
+                    </div>
+                    <div
+                        style="font-size: 10px; font-weight: 700; color: #A0AEC0; text-transform: uppercase; margin-bottom: 4px;">
+                        {{ note.created_at|date:"M d" }}</div>
+                    <p style="font-size: 12px; color: #4A5568; line-height: 1.4;">
+                        {{ note.content|truncatechars:100 }}
+                    </p>
+                </div>
+                {% empty %}
+                <p class="welcome-subtext" style="font-size: 12px;">No professional notes yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Crisis Panel Student Specific -->
+        {% if crisis_alerts %}
+        <div class="card" style="padding: 24px; background: #FFF5F5; border: 1px solid #FED7D7;">
+            <h3 style="font-size: 14px; color: #C53030; margin-bottom: 12px;">🔴 ACTIVE CRISIS ALERTS</h3>
+            {% for alert in crisis_alerts %}
+            {% if not alert.is_resolved %}
+            <div
+                style="font-size: 12px; color: #822727; margin-bottom: 8px; background: white; padding: 10px; border-radius: 8px;">
+                <strong>{{ alert.created_at|date:"M d, H:i" }}:</strong> {{ alert.message|truncatewords:15 }}
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

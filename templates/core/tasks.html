@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="header-action" style="align-items: center; margin-bottom: 50px;">
+    <h1 class="welcome-greeting" style="margin-bottom: 0;">Focus & Tasks</h1>
+    <p class="welcome-subtext">Tasks that align with your current energy level ({{ energy_level }}/10).</p>
+</div>
+
+<div class="dashboard-grid">
+    <!-- Add New Task Card -->
+    <div class="card card-white">
+        <h3 class="card-title">Add New Task</h3>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add">
+
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; font-weight: 700; margin-bottom: 10px; font-size: 14px;">Task
+                    Title</label>
+                <input type="text" name="title" placeholder="What needs to be done?" required
+                    style="width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #eee; background-color: #FBFCFC;">
+            </div>
+
+            <div style="margin-bottom: 30px;">
+                <label style="display: block; font-weight: 700; margin-bottom: 15px; font-size: 14px;">
+                    Energy Required (1-10) <span
+                        style="font-weight: 400; color: var(--text-muted); float: right;">5</span>
+                </label>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <input type="range" name="energy_level_required" min="1" max="10" value="5" class="energy-slider"
+                        style="width: 100%;"
+                        oninput="this.parentElement.previousElementSibling.querySelector('span').innerText = this.value">
+                </div>
+            </div>
+
+            <button type="submit" class="check-in-btn" style="width: 100%;">Add Task</button>
+        </form>
+    </div>
+
+    <!-- Suggested for You Card -->
+    <div class="card">
+        <h3 class="card-title">Suggested for You</h3>
+        <p class="welcome-subtext" style="font-size: 15px; margin-bottom: 25px;">Based on your energy, try these first:
+        </p>
+
+        <div class="task-list">
+            {% for task in suggested_tasks %}
+            <div class="journal-entry-card"
+                style="margin-top: 0; margin-bottom: 15px; padding: 15px; background: white;">
+                <form method="post" style="display: flex; align-items: center; width: 100%; gap: 15px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="toggle">
+                    <input type="hidden" name="task_id" value="{{ task.id }}">
+                    <button type="submit"
+                        style="width: 24px; height: 24px; border: 2px solid var(--primary-teal); border-radius: 50%; background: none; cursor: pointer;"></button>
+                    <div style="font-weight: 600; font-size: 15px;">{{ task.title }}</div>
+                </form>
+            </div>
+            {% empty %}
+            <p class="welcome-subtext" style="font-size: 15px;">No suggestions right now. Add some tasks!</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- All Pending Tasks Section -->
+    <div class="journal-list" style="grid-column: span 2; margin-top: 20px;">
+        <h1 class="welcome-greeting" style="font-size: 24px; margin-bottom: 25px;">All Pending Tasks</h1>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            {% for task in other_tasks %}
+            <div class="journal-entry-card"
+                style="margin-top: 0; padding: 20px; background: white; box-shadow: var(--shadow-subtle);">
+                <form method="post" style="display: flex; align-items: center; width: 100%; gap: 15px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="toggle">
+                    <input type="hidden" name="task_id" value="{{ task.id }}">
+                    <button type="submit"
+                        style="width: 24px; height: 24px; border: 2px solid var(--primary-teal); border-radius: 50%; background: none; cursor: pointer;"></button>
+                    <div style="font-weight: 600; font-size: 15px; flex: 1;">{{ task.title }}</div>
+                    <a href="{% url 'focus_timer' %}?task_id={{ task.id }}"
+                        style="text-decoration: none; font-size: 14px; color: #A0C4FF; font-weight: 700;">FOCUS</a>
+                </form>
+            </div>
+            {% empty %}
+            {% if not suggested_tasks %}
+            <div class="card" style="grid-column: span 2;">
+                <p class="welcome-subtext">No pending tasks. Take a moment to breathe!</p>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

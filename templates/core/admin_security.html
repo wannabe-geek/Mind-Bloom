@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Security & Compliance - Mindbloom{% endblock %}
+
+{% block content %}
+<div class="welcome-section" style="margin-bottom: 30px;">
+    <h1 class="welcome-greeting">Security & Compliance</h1>
+    <p class="welcome-subtext">System Audit & Safety Monitoring</p>
+</div>
+
+<div class="admin-dashboard">
+    <!-- Top Row: Security Stats -->
+    <div class="stat-card-small">
+        <div class="stat-icon" style="background: rgba(72, 187, 120, 0.1); color: #48BB78;">🛡️</div>
+        <div class="stat-value">{{ system_status }}</div>
+        <div class="stat-label">System Integrity</div>
+    </div>
+    <div class="stat-card-small">
+        <div class="stat-icon" style="background: rgba(245, 101, 101, 0.1); color: #F56565;">🚨</div>
+        <div class="stat-value">{{ unresolved_alerts.count }}</div>
+        <div class="stat-label">Active Alerts</div>
+    </div>
+    <div class="stat-card-small">
+        <div class="stat-icon" style="background: rgba(66, 153, 225, 0.1); color: #4299E1;">🕒</div>
+        <div class="stat-value">4h ago</div>
+        <div class="stat-label">Last Backup</div>
+    </div>
+    <div class="stat-card-small">
+        <div class="stat-icon" style="background: rgba(159, 122, 234, 0.1); color: #9F7AEA;">👤</div>
+        <div class="stat-value">{{ recent_signups.count }}</div>
+        <div class="stat-label">Recent Access</div>
+    </div>
+
+    <!-- Alert Timeline -->
+    <div class="chart-card" style="grid-column: span 2;">
+        <h3 class="chart-title" style="margin-bottom: 20px;">Safety Alerts (Audit Trail)</h3>
+        {% if unresolved_alerts %}
+        {% for alert in unresolved_alerts %}
+        <div class="timeline-item"
+            style="border-left: 2px solid #FED7D7; padding-left: 20px; position: relative; margin-bottom: 15px;">
+            <div
+                style="position: absolute; left: -7px; top: 0; width: 12px; height: 12px; background: #E53E3E; border-radius: 50%; border: 2px solid white;">
+            </div>
+            <div style="font-weight: 600; font-size: 14px; color: #E53E3E;">CRISIS DETECTED</div>
+            <div class="welcome-subtext" style="font-size: 12px;">Student: {{ alert.student.username }}</div>
+            <div style="font-size: 11px; color: #A0AEC0;">{{ alert.created_at|timesince }} ago</div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p style="color: #718096; text-align: center; padding: 40px;">No unresolved security alerts detected.</p>
+        {% endif %}
+    </div>
+
+    <!-- Signup Log -->
+    <div class="chart-card" style="grid-column: span 2;">
+        <h3 class="chart-title" style="margin-bottom: 20px;">Recent Registrations</h3>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Timestamp</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in recent_signups %}
+                <tr>
+                    <td style="font-weight: 600;">{{ u.username }}</td>
+                    <td style="color: #718096; font-size: 12px;">{{ u.date_joined|date:"M d, H:i" }}</td>
+                    <td><span class="profile-tag"
+                            style="font-size: 10px; background: #EDF2F7; color: #4A5568;">OAUTH2</span></td>
+                    <td><span class="profile-tag"
+                            style="font-size: 10px; background: #C6F6D5; color: #22543D;">VERIFIED</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

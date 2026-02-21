@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="header-action" style="align-items: center; margin-bottom: 50px;">
+    <div>
+        <h1 class="welcome-greeting" style="margin-bottom: 0;">AI Mind Companion</h1>
+        <p class="welcome-subtext">A calm space to rant, ask for advice, or just reflect.</p>
+    </div>
+</div>
+
+<div
+    style="max-width: 900px; margin: 0 auto; background: white; padding: 50px; border-radius: 30px; box-shadow: var(--shadow-subtle);">
+    <div class="chat-window" style="height: 450px; background: transparent; padding: 0; box-shadow: none;">
+
+        <!-- Welcome Message -->
+        <div class="chat-bubble ai-bubble"
+            style="background-color: var(--primary-teal); color: white; border-left: 5px solid var(--primary-coral); align-self: flex-start;">
+            Hello {{ user.username }}. I am your AI Mind Companion. I am here to listen and help you process your
+            thoughts. What would you like to talk about?
+        </div>
+
+        {% if user_message %}
+        <div class="chat-bubble user-bubble"
+            style="align-self: flex-end; background-color: #E9ECEF; color: #2D3436; margin-top: 20px;">
+            {{ user_message }}
+        </div>
+
+        <div class="chat-bubble ai-bubble"
+            style="align-self: flex-start; background-color: var(--primary-teal); color: white; border-left: 5px solid var(--primary-coral); margin-top: 20px;">
+            {{ ai_response }}
+        </div>
+        {% endif %}
+    </div>
+
+    <form method="post" class="chat-input-row" style="margin-top: 40px;">
+        {% csrf_token %}
+        <input type="text" name="message" class="chat-input" placeholder="Type your thoughts here..." required
+            style="padding: 20px 30px; border-radius: 15px; background-color: #FBFCFC; border: 1px solid #eee;">
+        <button type="submit" class="check-in-btn" style="padding: 0 40px;">Send</button>
+    </form>
+</div>
+{% endblock %}

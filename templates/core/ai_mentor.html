@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="header-action" style="margin-bottom: 40px;">
+    <h1 class="welcome-greeting">AI Mentor Insights</h1>
+    <p class="welcome-subtext">Deeper growth reflections based on your journey.</p>
+</div>
+
+<div class="card ai-insight-card" style="max-width: 800px; margin: 0 auto;">
+    <h3 class="card-title">Weekly Growth Perspective</h3>
+    <div class="ai-reflection-box" style="padding: 20px 0;">
+        {% if insights %}
+        <p class="ai-quote" style="line-height: 1.8;">"{{ insights }}"</p>
+        <div style="margin-top: 30px;">
+            <span class="ai-mentor-tag">AI MENTOR</span>
+        </div>
+        {% else %}
+        <p class="welcome-subtext" style="font-style: italic;">"Keep journaling your thoughts. Once you have a few
+            entries, I will be able to provide a unified mentorship perspective on your emotional growth and clarity."
+        </p>
+        <div style="margin-top: 30px;">
+            <a href="{% url 'journal' %}" class="check-in-btn">Start Journaling</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div style="max-width: 800px; margin: 40px auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <div class="card card-white">
+        <h4 style="margin-bottom: 10px;">Emotional Trends</h4>
+        <p class="welcome-subtext" style="font-size: 14px;">Your energy levels have been consistent this week. AI Mentor
+            suggests more focus on self-care tasks.</p>
+    </div>
+    <div class="card card-white">
+        <h4 style="margin-bottom: 10px;">Suggested Meditation</h4>
+        <p class="welcome-subtext" style="font-size: 14px;">Try a 5-minute deep breathing exercise before your next
+            journal session.</p>
+    </div>
+</div>
+{% endblock %}

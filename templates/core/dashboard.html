@@ -1,0 +1,643 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .alert-high {
+        color: #E53E3E;
+    }
+
+    .alert-low {
+        color: #48BB78;
+    }
+</style>
+
+{% if user.profile.role == 'ADMIN' %}
+<style>
+    /* Premium Dashboard Styles */
+    .admin-dashboard {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+        padding-bottom: 40px;
+    }
+
+    .stat-card-small {
+        background: white;
+        padding: 24px;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        transition: transform 0.2s;
+    }
+
+    .stat-card-small:hover {
+        transform: translateY(-4px);
+    }
+
+    .stat-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: #2D3748;
+        margin-bottom: 4px;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #718096;
+    }
+
+    .stat-icon {
+        font-size: 24px;
+        margin-bottom: 12px;
+    }
+
+    .chart-card {
+        background: white;
+        padding: 24px;
+        border-radius: 20px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        grid-column: span 2;
+        min-height: 350px;
+    }
+
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .chart-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #2D3748;
+    }
+
+    .mini-card {
+        padding: 20px;
+        border-radius: 16px;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 120px;
+    }
+
+    .activity-container {
+        grid-column: span 1;
+        background: white;
+        border-radius: 20px;
+        padding: 24px;
+    }
+
+    .table-container {
+        grid-column: span 3;
+        background: white;
+        border-radius: 20px;
+        padding: 24px;
+        overflow-x: auto;
+    }
+
+    .timeline-item {
+        display: flex;
+        gap: 12px;
+        padding: 12px 0;
+        border-left: 2px solid #E2E8F0;
+        padding-left: 20px;
+        position: relative;
+    }
+
+    .timeline-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        position: absolute;
+        left: -7px;
+        top: 16px;
+        background: #A0C4FF;
+        border: 2px solid white;
+    }
+
+    .alert-dot {
+        background: #F56565;
+    }
+
+    .user-dot {
+        background: #48BB78;
+    }
+
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .admin-table th {
+        padding: 12px;
+        color: #718096;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-bottom: 1px solid #EDF2F7;
+    }
+
+    .admin-table td {
+        padding: 16px 12px;
+        font-size: 14px;
+        border-bottom: 1px solid #EDF2F7;
+    }
+
+    /* Admin Dark-Side Refinement */
+    body:has(.admin-dashboard) .sidebar {
+        background: #1A202C !important;
+        color: #E2E8F0 !important;
+    }
+
+    body:has(.admin-dashboard) .nav-item {
+        color: #A0AEC0 !important;
+    }
+
+    body:has(.admin-dashboard) .nav-item.active {
+        background: rgba(255, 255, 255, 0.05) !important;
+        color: #FF7EB3 !important;
+    }
+
+    body:has(.admin-dashboard) .main-content {
+        background: #F7FAFC;
+    }
+</style>
+
+<div class="welcome-section" style="margin-bottom: 30px;">
+    <h1 class="welcome-greeting">{{ greeting }}, {{ user.username }}</h1>
+    <p class="welcome-subtext">Mindbloom Global Analytics Command</p>
+</div>
+
+<div class="admin-dashboard">
+    <!-- Top Row: Core Stats -->
+    <div class="stat-card-small">
+        <div class="stat-icon"
+            style="background: rgba(66, 153, 225, 0.1); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+            🎓</div>
+        <div class="stat-value">{{ total_students }}</div>
+        <div class="stat-label">Active Students</div>
+    </div>
+    <div class="stat-card-small">
+        <div class="stat-icon"
+            style="background: rgba(72, 187, 120, 0.1); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+            👩‍⚕️</div>
+        <div class="stat-value">{{ total_therapists }}</div>
+        <div class="stat-label">Active Therapists</div>
+    </div>
+    <div class="stat-card-small">
+        <div class="stat-icon"
+            style="background: rgba(245, 101, 101, 0.1); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+            🚨</div>
+        <div class="stat-value" style="color: #E53E3E;">{{ unresolved_alerts }}</div>
+        <div class="stat-label">Pending Alerts</div>
+    </div>
+    <div class="stat-card-small">
+        <div class="stat-icon"
+            style="background: rgba(159, 122, 234, 0.1); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+            🌐</div>
+        <div class="stat-value">Mindbloom</div>
+        <div class="stat-label">System Online</div>
+    </div>
+
+    <!-- Second Row: Major Charts -->
+    <div class="chart-card">
+        <div class="chart-header">
+            <div>
+                <h3 class="chart-title" style="margin-bottom: 5px;">Student Growth</h3>
+                <span class="welcome-subtext" style="color: #FF7EB3; font-weight: 700;">+12% spike today</span>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <span style="font-size: 10px; color: #718096; font-weight: 700;">Daily</span>
+                <span style="font-size: 10px; color: #CBD5E0;">Weekly</span>
+            </div>
+        </div>
+        <div style="height: 220px; position: relative;">
+            <svg viewBox="0 0 600 200" style="width: 100%; height: 100%;" preserveAspectRatio="none">
+                <defs>
+                    <linearGradient id="growthGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#FF7EB3" stop-opacity="0.4" />
+                        <stop offset="100%" stop-color="#FF7EB3" stop-opacity="0" />
+                    </linearGradient>
+                </defs>
+
+                <!-- Area Fill -->
+                <path d="M 0,200 L 0,{{ 200|add:" -40" }} {% for count in growth_data %} L {{
+                    forloop.counter0|add:forloop.counter0|add:forloop.counter0|add:forloop.counter0|add:forloop.counter0|add:forloop.counter0|add:forloop.counter0|add:forloop.counter0|add:forloop.counter0|add:forloop.counter0|add:forloop.counter0|add:forloop.counter0
+                    }}, {{ 200|add:"-40"|add:"-20" }} {% endfor %} L 600,200 Z" fill="url(#growthGradient)" />
+
+                <!-- Trend Line -->
+                <path d="M 0,200 
+                    {% for count in growth_data %}
+                        L {{ forloop.counter0|add:forloop.counter0|add:forloop.counter0|add:forloop.counter0|add:forloop.counter0|add:forloop.counter0|add:forloop.counter0|add:forloop.counter0|add:forloop.counter0|add:forloop.counter0 }},
+                        {{ 180|add:" -30" }} {% endfor %}" fill="none" stroke="#FF7EB3" stroke-width="4"
+                    stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <div
+                style="display: flex; justify-content: space-between; margin-top: 15px; border-top: 1px dashed #E2E8F0; padding-top: 10px;">
+                {% for label in growth_labels %}
+                <span style="font-size: 10px; color: #A0AEC0; font-weight: 600;">{{ label }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="chart-card">
+        <div class="chart-header">
+            <h3 class="chart-title">Wellness Distribution</h3>
+            <span class="welcome-subtext">Global Mood Avg</span>
+        </div>
+        <div style="display: flex; justify-content: center; align-items: center; height: 250px;">
+            <div style="position: relative; width: 180px; height: 180px;">
+                <svg viewBox="0 0 100 100" style="transform: rotate(-90deg);">
+                    <circle cx="50" cy="50" r="40" fill="transparent" stroke="#EDF2F7" stroke-width="12" />
+                    <circle cx="50" cy="50" r="40" fill="transparent" stroke="#A0C4FF" stroke-width="12"
+                        stroke-dasharray="{{ avg_mood|add:avg_mood|add:avg_mood|add:avg_mood|add:avg_mood|add:avg_mood|add:avg_mood|add:avg_mood|add:avg_mood|add:avg_mood|add:avg_mood|add:avg_mood|add:avg_mood|add:avg_mood|add:avg_mood|add:avg_mood|add:avg_mood|add:avg_mood|add:avg_mood|add:avg_mood }}, 251" />
+                </svg>
+                <div
+                    style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                    <span style="font-size: 32px; font-weight: 800; color: #2D3748;">{{ avg_mood }}</span>
+                    <p style="font-size: 10px; color: #718096; font-weight: 700;">MOOD AVG</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Third Row: Status Cards -->
+    <div class="mini-card" style="background: linear-gradient(135deg, #FF7EB3 0%, #FF758C 100%);">
+        <span style="font-weight: 700; font-size: 12px;">AVG ENERGY</span>
+        <h2 style="font-size: 28px;">{{ avg_energy }}/10</h2>
+        <span style="font-size: 10px; opacity: 0.8;">Community Vitality</span>
+    </div>
+    <div class="mini-card" style="background: linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%);">
+        <span style="font-weight: 700; font-size: 12px;">PAGE VIEWS (Engagements)</span>
+        <h2 style="font-size: 28px;">{{ dynamic_page_views|default:"0" }}</h2>
+        <span style="font-size: 10px; opacity: 0.8;">Total Interactions</span>
+    </div>
+    <div class="mini-card" style="background: linear-gradient(135deg, #00C9FF 0%, #92FE9D 100%);">
+        <span style="font-weight: 700; font-size: 12px;">BOUNCE RATE</span>
+        <h2 style="font-size: 28px;">{{ bounce_rate|default:"0" }}%</h2>
+        <span style="font-size: 10px; opacity: 0.8;">User Inactivity Index</span>
+    </div>
+    <div class="mini-card" style="background: linear-gradient(135deg, #F09819 0%, #EDDE5D 100%);">
+        <span style="font-weight: 700; font-size: 12px;">SYSTEM STATUS</span>
+        <h2 style="font-size: 28px;">OPTIMAL</h2>
+        <span style="font-size: 10px; opacity: 0.8;">A.I. Latency: 120ms</span>
+    </div>
+
+    <!-- Fourth Row: Activity & Alerts -->
+    <div class="activity-container">
+        <h3 class="chart-title" style="margin-bottom: 20px;">Recent Activity</h3>
+        {% for activity in activity_feed %}
+        <div class="timeline-item">
+            <div class="timeline-dot {% if activity.type == 'ALERT' %}alert-dot{% else %}user-dot{% endif %}"></div>
+            <div>
+                <p style="font-size: 14px; font-weight: 600; margin-bottom: 2px;">{{ activity.title }}</p>
+                <p class="welcome-subtext" style="font-size: 12px; margin-bottom: 4px;">{{ activity.desc }}</p>
+                <span style="font-size: 10px; color: #A0AEC0;">{{ activity.time|timesince }} ago</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="table-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 class="chart-title">System Status Overview</h3>
+            <button class="check-in-btn" style="padding: 5px 15px; font-size: 12px;">Download Report</button>
+        </div>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Module</th>
+                    <th>Status</th>
+                    <th>Metric</th>
+                    <th>Impact</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>AI Personalization</td>
+                    <td><span class="profile-tag" style="background: #C6F6D5; color: #22543D;">STABLE</span></td>
+                    <td>99.2% Accuracy</td>
+                    <td>High</td>
+                    <td><a href="#" style="color: #4C51BF; font-weight: 600;">View</a></td>
+                </tr>
+                <tr>
+                    <td>Crisis Monitoring</td>
+                    <td><span class="profile-tag" style="background: #FED7D7; color: #822727;">ACTIVE</span></td>
+                    <td>{{ unresolved_alerts }} Alerts</td>
+                    <td>Critical</td>
+                    <td><a href="#" style="color: #4C51BF; font-weight: 600;">Resolve</a></td>
+                </tr>
+                <tr>
+                    <td>Therapist Network</td>
+                    <td><span class="profile-tag" style="background: #C6F6D5; color: #22543D;">HEALTHY</span></td>
+                    <td>{{ total_therapists }} Active</td>
+                    <td>Medium</td>
+                    <td><a href="#" style="color: #4C51BF; font-weight: 600;">Manage</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% elif user.profile.role == 'THERAPIST' %}
+<!-- Professional Therapist Portal Hub -->
+<div class="welcome-section" style="margin-bottom: 40px;">
+    <h1 class="welcome-greeting">Therapist Command Center</h1>
+    <p class="welcome-subtext">Manage your professional practice, student insights, and clinical records.</p>
+</div>
+
+<div style="margin-bottom: 45px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="font-size: 18px; font-weight: 700; color: #1A202C; display: flex; align-items: center; gap: 10px;">
+            <span
+                style="display: inline-block; width: 4px; height: 18px; background: #6366F1; border-radius: 2px;"></span>
+            Practice Tools
+        </h2>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px;">
+        <a href="{% url 'therapist_appointments' %}" style="text-decoration: none;">
+            <div class="qa-card">
+                <div class="qa-icon" style="background: linear-gradient(135deg, #FC8181, #F56565);">📅</div>
+                <div class="qa-label">Appointments</div>
+            </div>
+        </a>
+        <a href="{% url 'therapist_profile' %}" style="text-decoration: none;">
+            <div class="qa-card">
+                <div class="qa-icon" style="background: linear-gradient(135deg, #A0C4FF, #63B3ED);">👤</div>
+                <div class="qa-label">Pro Profile</div>
+            </div>
+        </a>
+        <a href="{% url 'therapist_insights' %}" style="text-decoration: none;">
+            <div class="qa-card">
+                <div class="qa-icon" style="background: linear-gradient(135deg, #68D391, #48BB78);">📊</div>
+                <div class="qa-label">Insights</div>
+            </div>
+        </a>
+        <a href="{% url 'therapist_crisis' %}" style="text-decoration: none;">
+            <div class="qa-card">
+                <div class="qa-icon" style="background: linear-gradient(135deg, #FEB2B2, #E53E3E);">🚨</div>
+                <div class="qa-label">Crisis Center</div>
+            </div>
+        </a>
+        <a href="{% url 'messages_list' %}" style="text-decoration: none;">
+            <div class="qa-card">
+                <div class="qa-icon" style="background: linear-gradient(135deg, #CBD5E0, #A0AEC0);">✉️</div>
+                <div class="qa-label">Messages</div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="welcome-section" style="margin-top: 50px;">
+    <h1 class="welcome-greeting">Active Clients</h1>
+    <p class="welcome-subtext">Manage your connected students and their plans.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px;">
+    {% for connection in connections %}
+    <div class="card" style="padding: 0; overflow: hidden; position: relative;">
+        <!-- Card Header with Subtle Gradient -->
+        <div style="height: 80px; background: linear-gradient(135deg, #769891 0%, #4A6D6C 100%);"></div>
+
+        <div style="padding: 0 24px 24px 24px; margin-top: -30px; text-align: center;">
+            <!-- Avatar -->
+            <div class="profile-avatar"
+                style="margin: 0 auto 12px; border: 4px solid white; width: 64px; height: 64px; font-size: 24px; --avatar-bg: {{ connection.student.profile.avatar_color|default:'#A0C4FF' }}; background-color: var(--avatar-bg); box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                {{ connection.student.profile.get_initial }}
+            </div>
+
+            <h3 style="font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 4px;">
+                {{ connection.student.username }}
+            </h3>
+            <p style="font-size: 12px; color: #64748b; margin-bottom: 20px;">
+                Patient since {{ connection.created_at|date:"M Y" }}
+            </p>
+
+            <!-- Metrics Grid -->
+            <div
+                style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; padding: 15px; background: #f8fafc; border-radius: 12px;">
+                <div style="text-align: center;">
+                    <div
+                        style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">
+                        Status</div>
+                    <div style="font-size: 12px; font-weight: 700; color: #10b981;">ACTIVE</div>
+                </div>
+                <div style="text-align: center;">
+                    <div
+                        style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">
+                        Wellness</div>
+                    <div style="font-size: 12px; font-weight: 700; color: #6366f1;">STABLE</div>
+                </div>
+            </div>
+
+            <!-- Primary Action -->
+            <a href="{% url 'therapist_records' connection.student.id %}" class="check-in-btn"
+                style="display: block; width: 100%; padding: 12px; font-size: 14px; text-decoration: none; border-radius: 10px; background: #1e293b; color: white;">Clinical
+                Records</a>
+        </div>
+    </div>
+    {% empty %}
+    <div class="card"
+        style="grid-column: 1 / -1; text-align: center; padding: 80px 40px; border-style: dashed; border-width: 2px; background: #F9FAFB;">
+        <div style="font-size: 50px; margin-bottom: 24px; opacity: 0.8;">🤝</div>
+        <h3 style="font-size: 20px; color: #475569; margin-bottom: 10px;">Build Your Practice</h3>
+        <p style="color: #64748b; font-size: 14px; max-width: 400px; margin: 0 auto;">No clients connected yet. Once a
+            student requests you as their therapist, their clinical profile will appear here.</p>
+    </div>
+    {% endfor %}
+</div>
+
+{% else %}
+<!-- Student Dashboard - REDESIGNED to match Screenshot 1 -->
+<div class="welcome-section">
+    <h1 class="welcome-greeting">{{ greeting }}, {{ user.username }}</h1>
+    <p class="welcome-subtext">Welcome back to your safe space.</p>
+</div>
+
+{% if breakthrough %}
+<!-- Phase 9: AI Breakthrough Highlight -->
+<div class="card"
+    style="background: linear-gradient(135deg, #F0F7FF 0%, #FFFFFF 100%); border: 1px solid #A0C4FF; margin-bottom: 30px; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: -10px; right: -10px; font-size: 80px; opacity: 0.1; pointer-events: none;">✨
+    </div>
+    <div style="display: flex; gap: 20px; align-items: flex-start; padding: 10px;">
+        <div style="font-size: 30px;">🌟</div>
+        <div>
+            <h3 style="color: #4A6D6C; margin-bottom: 5px; font-size: 18px;">Breakthrough Insight</h3>
+            <p style="font-size: 14px; line-height: 1.5; color: #2D3436; margin-bottom: 10px;">{{
+                breakthrough|linebreaksbr }}</p>
+            <div
+                style="display: inline-block; background-color: #A0C4FF; color: white; padding: 3px 10px; border-radius: 12px; font-size: 10px; font-weight: 700; text-transform: uppercase;">
+                Growth Milestone</div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="dashboard-grid">
+    <!-- Mood Card with Tab-style Check In -->
+    <div class="card card-white" style="position: relative; padding-top: 50px;">
+        <div
+            style="position: absolute; top: 0; left: 0; background-color: #4A6D6C; color: white; padding: 10px 30px; border-bottom-right-radius: 12px; font-weight: 700; font-size: 14px; ">
+            Check In
+        </div>
+        <div style="margin-bottom: 20px;">
+            <p class="welcome-subtext" style="font-size: 14px; margin-bottom: 5px;">Check In</p>
+            <h3 class="card-title" style="margin-bottom: 0;">Latest Mood</h3>
+        </div>
+
+        <div class="mood-display">
+            <div class="mood-text-group">
+                {% if latest_mood %}
+                <h4 style="font-size: 18px; font-weight: 600;">Feeling
+                    {% if latest_mood.mood_score > 7 %}great
+                    {% elif latest_mood.mood_score > 4 %}neutral
+                    {% else %}low{% endif %}
+                </h4>
+                <span class="mood-date">{{latest_mood.created_at|date:"j/n/Y"}}</span>
+                {% else %}
+                <h4 style="font-size: 18px;">No data yet.</h4>
+                <span style="font-size: 14px;">How are you feeling today?</span>
+                {% endif %}
+            </div>
+            <div class="mood-emoji-large" style="margin-top: 10px;">
+                {% if latest_mood %}
+                {% if latest_mood.mood_score > 7 %}😊
+                {% elif latest_mood.mood_score > 4 %}😐
+                {% else %}😔{% endif %}
+                {% else %}
+                😶
+                {% endif %}
+            </div>
+        </div>
+        <a href="{% url 'mood_checkin' %}"
+            style="position: absolute; top: 0; left: 0; width: 100px; height: 40px; display: block;"
+            title="Check In"></a>
+    </div>
+
+    <!-- Goals Card -->
+    <div class="card card-white">
+        <h3 class="card-title">Treatment Goal</h3>
+        <p class="welcome-subtext" style="font-size: 16px;">No active plan assigned.</p>
+    </div>
+
+    <!-- Journal Entries Card -->
+    <div class="card card-white" style="grid-column: span 1;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 class="card-title" style="margin-bottom: 0;">Recent Journal Entries</h3>
+            <a href="{% url 'journal' %}"
+                style="color: #6B46C1; font-weight: 600; text-decoration: underline; font-size: 14px;">View All</a>
+        </div>
+
+        {% for journal in recent_journals %}
+        <div style="margin-top: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+            <h4 style="font-size: 16px; font-weight: 700;">{{ journal.content|truncatechars:20|upper }}</h4>
+            <p style="font-size: 14px; color: #2D3436; margin: 3px 0;">{{ journal.content|truncatewords:10 }}</p>
+            <span class="welcome-subtext" style="font-size: 12px;">{{ journal.created_at|date:"j/n/Y" }}</span>
+        </div>
+        {% empty %}
+        <p class="welcome-subtext">Start your first journal entry to reflect on your day.</p>
+        {% endfor %}
+    </div>
+
+    <!-- AI Mentor Card -->
+    <div class="card card-white" style="grid-column: span 1; border-left: 5px solid var(--primary-coral);">
+        <h3 class="card-title">AI Mentor</h3>
+        {% if ai_mentor_insight %}
+        <p class="ai-quote" style="font-size: 15px; line-height: 1.6;">"{{ ai_mentor_insight }}"</p>
+        <div style="margin-top: 15px;">
+            <span class="ai-mentor-tag" style="font-size: 10px; padding: 4px 12px;">AI MENTOR</span>
+        </div>
+        {% else %}
+        <p class="welcome-subtext" style="font-style: italic; font-size: 14px;">"Journal your thoughts to receive growth
+            perspectives."</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ===== QUICK ACCESS GRID ===== -->
+<div style="margin-top: 36px;">
+    <h2 style="font-size: 18px; font-weight: 700; color: #2D3748; margin-bottom: 18px;">Quick Access</h2>
+    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px;">
+
+        <a href="{% url 'mood_checkin' %}" style="text-decoration: none;">
+            <div class="qa-card">
+                <div class="qa-icon" style="background: linear-gradient(135deg, #FBD38D, #F6AD55);">😊</div>
+                <div class="qa-label">Mood Tracker</div>
+            </div>
+        </a>
+
+        <a href="{% url 'focus_timer' %}" style="text-decoration: none;">
+            <div class="qa-card">
+                <div class="qa-icon" style="background: linear-gradient(135deg, #FC8181, #F56565);">⏱️</div>
+                <div class="qa-label">Focus Timer</div>
+            </div>
+        </a>
+
+        <a href="{% url 'find_therapist' %}" style="text-decoration: none;">
+            <div class="qa-card">
+                <div class="qa-icon" style="background: linear-gradient(135deg, #76E4F7, #4299E1);">👥</div>
+                <div class="qa-label">Find Therapist</div>
+            </div>
+        </a>
+
+        <a href="{% url 'find_resources' %}" style="text-decoration: none;">
+            <div class="qa-card">
+                <div class="qa-icon" style="background: linear-gradient(135deg, #68D391, #48BB78);">📚</div>
+                <div class="qa-label">Resource Hub</div>
+            </div>
+        </a>
+
+        <a href="{% url 'self_help' %}" style="text-decoration: none;">
+            <div class="qa-card">
+                <div class="qa-icon" style="background: linear-gradient(135deg, #B794F4, #9F7AEA);">🧘</div>
+                <div class="qa-label">Self-Help Tools</div>
+            </div>
+        </a>
+
+        <a href="{% url 'messages_list' %}" style="text-decoration: none;">
+            <div class="qa-card">
+                <div class="qa-icon" style="background: linear-gradient(135deg, #CBD5E0, #A0AEC0);">💬</div>
+                <div class="qa-label">Messages</div>
+            </div>
+        </a>
+
+        <a href="{% url 'ai_chat' %}" style="text-decoration: none;">
+            <div class="qa-card">
+                <div class="qa-icon" style="background: linear-gradient(135deg, #90CDF4, #63B3ED);">🤖</div>
+                <div class="qa-label">AI Chat</div>
+            </div>
+        </a>
+
+        <a href="{% url 'ai_mentor' %}" style="text-decoration: none;">
+            <div class="qa-card">
+                <div class="qa-icon" style="background: linear-gradient(135deg, #FBB6CE, #F687B3);">🌟</div>
+                <div class="qa-label">AI Mentor</div>
+            </div>
+        </a>
+
+        <a href="{% url 'settings' %}" style="text-decoration: none;">
+            <div class="qa-card">
+                <div class="qa-icon" style="background: linear-gradient(135deg, #E2E8F0, #CBD5E0);">⚙️</div>
+                <div class="qa-label">Settings</div>
+            </div>
+        </a>
+
+    </div>
+</div>
+
+
+
+{% endif %}
+
+
+{% endblock %}

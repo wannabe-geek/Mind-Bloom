@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-grid">
+    <!-- New Entry Card -->
+    <div class="card card-white">
+        <h3 class="card-title">New Entry</h3>
+        <form method="post">
+            {% csrf_token %}
+            <textarea name="content" placeholder="Share your thoughts, feelings, or what happened today..."
+                style="width: 100%; min-height: 250px; padding: 20px; border-radius: 15px; border: 1px solid #eee; font-family: inherit; margin-bottom: 25px; outline: none;"
+                required></textarea>
+            <button type="submit" class="check-in-btn" style="width: 100%;">Save & Reflect</button>
+        </form>
+    </div>
+
+    <!-- AI Insights Card -->
+    <div class="card ai-insight-card">
+        <h3 class="card-title">AI Insights</h3>
+        <div class="ai-reflection-box">
+            <p class="ai-quote">
+                {% if journals.0.ai_reflection %}
+                "{{ journals.0.ai_reflection }}"
+                {% else %}
+                "AI service is currently unavailable. Reflect on your thoughts and breathe deeply."
+                {% endif %}
+            </p>
+            <div class="ai-mentor-tag">AI MENTOR</div>
+        </div>
+    </div>
+
+    <!-- Past Reflections Section -->
+    <div class="journal-list" style="grid-column: span 2; margin-top: 20px;">
+        <h1 class="welcome-greeting" style="font-size: 24px; margin-bottom: 20px;">Past Reflections</h1>
+
+        {% for journal in journals %}
+        <div class="journal-entry-card" style="margin-top: 0; margin-bottom: 20px;">
+            <div class="journal-content-preview">
+                <h4>{{ journal.created_at|date:"F j, Y" }}</h4>
+                <p>{{ journal.content|linebreaks }}</p>
+                {% if journal.ai_reflection %}
+                <div
+                    style="margin-top: 15px; padding-left: 15px; border-left: 3px solid var(--primary-coral); font-style: italic; font-size: 14px; color: var(--text-muted);">
+                    AI Mentor: {{ journal.ai_reflection }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="card">
+            <p class="welcome-subtext">Your reflections will appear here. Start by writing your first entry above!</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

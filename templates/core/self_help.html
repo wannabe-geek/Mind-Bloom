@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="header-action" style="margin-bottom: 40px;">
+    <h1 class="welcome-greeting">Self-Help Toolkit</h1>
+    <p class="welcome-subtext">Interactive tools to help you find calm in the moment.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(450px, 1fr)); gap: 30px;">
+    <!-- Breathing Exercise Card -->
+    <div class="card" style="text-align: center; padding: 50px 30px; position: relative; overflow: hidden;">
+        <div
+            style="position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: linear-gradient(90deg, #A0C4FF, #BDB2FF);">
+        </div>
+        <h2 style="margin-bottom: 30px;">4-7-8 Breathing</h2>
+
+        <div id="breathing-circle"
+            style="width: 200px; height: 200px; border-radius: 50%; background: rgba(160, 196, 255, 0.2); margin: 0 auto 40px; border: 1px solid rgba(160, 196, 255, 0.5); display: flex; align-items: center; justify-content: center; transition: all 4s ease-in-out;">
+            <div id="inner-circle"
+                style="width: 100px; height: 100px; border-radius: 50%; background: #A0C4FF; transition: all 1s ease-in-out;">
+            </div>
+        </div>
+
+        <h3 id="breathing-text" style="font-size: 24px; color: #4A6D6C; margin-bottom: 10px;">Ready to start?</h3>
+        <p class="welcome-subtext" style="margin-bottom: 30px;">This simple exercise helps reduce anxiety and improve
+            sleep.</p>
+
+        <button id="start-breathing" class="check-in-btn" style="min-width: 200px;">Start Exercise</button>
+    </div>
+
+    <!-- Grounding Technique Card -->
+    <div class="card" style="padding: 40px;">
+        <h2 style="margin-bottom: 25px;">5-4-3-2-1 Grounding</h2>
+        <p class="welcome-subtext" style="margin-bottom: 30px; line-height: 1.6;">If you feel overwhelmed, try this
+            grounding technique to bring your focus back to the present moment.</p>
+
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div
+                    style="width: 35px; height: 35px; border-radius: 50%; background: #FFADAD; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;">
+                    5</div>
+                <p>Things you can <strong>see</strong></p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div
+                    style="width: 35px; height: 35px; border-radius: 50%; background: #FFD6A5; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;">
+                    4</div>
+                <p>Things you can <strong>touch</strong></p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div
+                    style="width: 35px; height: 35px; border-radius: 50%; background: #FDFFB6; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #666;">
+                    3</div>
+                <p>Things you can <strong>hear</strong></p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div
+                    style="width: 35px; height: 35px; border-radius: 50%; background: #CAFFBF; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #666;">
+                    2</div>
+                <p>Things you can <strong>smell</strong></p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div
+                    style="width: 35px; height: 35px; border-radius: 50%; background: #9BF6FF; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;">
+                    1</div>
+                <p>Thing you can <strong>taste</strong></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const startBtn = document.getElementById('start-breathing');
+    const circle = document.getElementById('breathing-circle');
+    const innerCircle = document.getElementById('inner-circle');
+    const text = document.getElementById('breathing-text');
+
+    let isBreathing = false;
+
+    function breathe() {
+        if (!isBreathing) return;
+
+        // Inhale (4 seconds)
+        text.innerText = "Inhale...";
+        circle.style.transform = "scale(1.5)";
+        innerCircle.style.transform = "scale(1.5)";
+        circle.style.backgroundColor = "rgba(160, 196, 255, 0.4)";
+
+        setTimeout(() => {
+            if (!isBreathing) return;
+            // Hold (7 seconds)
+            text.innerText = "Hold...";
+
+            setTimeout(() => {
+                if (!isBreathing) return;
+                // Exhale (8 seconds)
+                text.innerText = "Exhale slowly...";
+                circle.style.transform = "scale(1)";
+                innerCircle.style.transform = "scale(1)";
+                circle.style.backgroundColor = "rgba(160, 196, 255, 0.1)";
+
+                setTimeout(() => {
+                    if (isBreathing) breathe();
+                }, 8000);
+            }, 7000);
+        }, 4000);
+    }
+
+    startBtn.addEventListener('click', () => {
+        isBreathing = !isBreathing;
+        if (isBreathing) {
+            startBtn.innerText = "Stop";
+            startBtn.style.backgroundColor = "#FFADAD";
+            breathe();
+        } else {
+            startBtn.innerText = "Start Exercise";
+            startBtn.style.backgroundColor = "";
+            text.innerText = "Ready to start?";
+            circle.style.transform = "scale(1)";
+            innerCircle.style.transform = "scale(1)";
+            circle.style.backgroundColor = "rgba(160, 196, 255, 0.2)";
+        }
+    });
+</script>
+{% endblock %}

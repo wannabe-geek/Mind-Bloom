@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="header-action" style="margin-bottom: 40px;">
+    <div>
+        <h1 class="welcome-greeting">Appointment Manager</h1>
+        <p class="welcome-subtext">Manage your schedule and student bookings.</p>
+    </div>
+    <div style="display: flex; gap: 12px;">
+        <div class="card"
+            style="padding: 10px 20px; display: flex; align-items: center; gap: 10px; border-radius: 12px;">
+            <span style="font-size: 18px;">📅</span>
+            <span style="font-weight: 700; color: #2D3748;">{{ confirmed.count }} Confirmed</span>
+        </div>
+        <div class="card"
+            style="padding: 10px 20px; display: flex; align-items: center; gap: 10px; border-radius: 12px; border-left: 4px solid #F6AD55;">
+            <span style="font-size: 18px;">⏳</span>
+            <span style="font-weight: 700; color: #F6AD55;">{{ pending.count }} Pending</span>
+        </div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+    <!-- Main Appointment Feed -->
+    <div class="card" style="padding: 0; overflow: hidden;">
+        <div
+            style="padding: 20px 30px; border-bottom: 1px solid #EDF2F7; background: #F8FAFC; display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="font-size: 16px;">Upcoming Sessions</h3>
+            <span style="font-size: 11px; font-weight: 700; color: #718096; text-transform: uppercase;">Next 7
+                Days</span>
+        </div>
+
+        <div style="padding: 0 30px;">
+            {% for appt in appointments %}
+            <div
+                style="display: flex; align-items: center; justify-content: space-between; padding: 25px 0; border-bottom: 1px solid #F0F4F8;">
+                <div style="display: flex; gap: 20px; align-items: center;">
+                    <div
+                        style="text-align: center; background: #EDF2F7; padding: 8px 15px; border-radius: 12px; min-width: 80px;">
+                        <div style="font-size: 12px; font-weight: 700; color: #718096; text-transform: uppercase;">
+                            {{ appt.scheduled_at|date:"M" }}
+                        </div>
+                        <div style="font-size: 24px; font-weight: 800; color: #2D3748;">
+                            {{ appt.scheduled_at|date:"d" }}
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 16px; color: #2D3748;">{{ appt.student.username }}
+                        </div>
+                        <div style="font-size: 13px; color: #718096; display: flex; align-items: center; gap: 5px;">
+                            <span>🕒</span> {{ appt.scheduled_at|date:"h:i A" }}
+                            <span style="color: #CBD5E0;">•</span>
+                            <span>⏳</span> 60 min session
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <span class="profile-tag" style="
+                        {% if appt.status == 'CONFIRMED' %}background: #C6F6D5; color: #22543D;
+                        {% elif appt.status == 'PENDING' %}background: #FEEBC8; color: #744210;
+                        {% elif appt.status == 'COMPLETED' %}background: #EBF8FF; color: #2B6CB0;
+                        {% elif appt.status == 'REJECTED' %}background: #FED7D7; color: #822727;
+                        {% endif %} font-size: 10px; font-weight: 800;">
+                        {{ appt.status }}
+                    </span>
+
+                    {% if appt.status == 'PENDING' %}
+                    <form method="post" style="display: flex; gap: 8px;">
+                        {% csrf_token %}
+                        <input type="hidden" name="appt_id" value="{{ appt.id }}">
+                        <button name="action" value="confirm" class="check-in-btn"
+                            style="padding: 8px 16px; font-size: 12px; background: #48BB78;">Accept</button>
+                        <button name="action" value="reject" class="check-in-btn"
+                            style="padding: 8px 16px; font-size: 12px; background: #E53E3E;">Decline</button>
+                    </form>
+                    {% elif appt.status == 'CONFIRMED' %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="appt_id" value="{{ appt.id }}">
+                        <button name="action" value="complete" class="check-in-btn"
+                            style="padding: 8px 16px; font-size: 12px;">Mark Done</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div style="padding: 60px; text-align: center;">
+                <div style="font-size: 48px; margin-bottom: 20px;">🗓️</div>
+                <h3 style="color: #4A5568;">No upcoming appointments</h3>
+                <p class="welcome-subtext">Bookings from your students will appear here.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Calendar Sync & Tools -->
+    <div style="display: flex; flex-direction: column; gap: 30px;">
+        <div class="card"
+            style="padding: 24px; background: linear-gradient(135deg, #FF7EB3 0%, #FF758C 100%); color: white; border: none;">
+            <h3 style="font-size: 16px; margin-bottom: 10px;">Calendar Sync</h3>
+            <p style="font-size: 13px; opacity: 0.9; margin-bottom: 20px; line-height: 1.5;">Connect your external
+                calendar to prevent double-booking and receive mobile reminders.</p>
+            <button class="check-in-btn"
+                style="background: white; color: #FF758C; width: 100%; font-size: 12px; font-weight: 800;">CONNECT
+                GOOGLE CALENDAR</button>
+        </div>
+
+        <div class="card" style="padding: 24px;">
+            <h3 style="font-size: 15px; margin-bottom: 15px; color: #2D3748;">Scheduling Rules</h3>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 13px; color: #718096;">Buffer Time</span>
+                    <span style="font-size: 12px; font-weight: 700; color: #2D3748;">15 min</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 13px; color: #718096;">Min. Notice</span>
+                    <span style="font-size: 12px; font-weight: 700; color: #2D3748;">24 hours</span>
+                </div>
+                <hr style="border: 0; border-top: 1px solid #F0F4F8; margin: 5px 0;">
+                <button
+                    style="background: none; border: 1px solid #E2E8F0; padding: 10px; border-radius: 8px; font-size: 12px; font-weight: 600; color: #4A5568; cursor: pointer;">Edit
+                    Scheduling Logic</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

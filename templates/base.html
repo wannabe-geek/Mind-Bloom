@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindBloom - Mental Clarity</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5.8' y='5.8' width='20.4' height='20.4' rx='4' fill='%231AC0AD' transform='rotate(45 16 16)'/></svg>">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div
+        class="app-container {% if not user.is_authenticated %}auth-layout{% endif %} {% if user.is_authenticated and user.profile.role == 'ADMIN' %}admin-sidebar-mode{% endif %}">
+
+        {% if user.is_authenticated %}
+        <!-- Sidebar as a Card -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <div class="logo-icon"></div>
+                <div class="logo-text">
+                    <span class="logo-mind">Mind</span><span class="logo-bloom">Bloom</span>
+                </div>
+            </div>
+
+            <div class="user-profile">
+                <div class="profile-avatar">{{ user.profile.get_initial }}</div>
+                <div class="profile-tag">{{ user.profile.role|default:"STUDENT" }}</div>
+            </div>
+
+            <nav class="side-nav">
+                {% if user.profile.role == 'ADMIN' %}
+                <div class="nav-section-label"
+                    style="font-size: 11px; color: #718096; padding: 20px 0 10px; text-transform: uppercase; font-weight: 700;">
+                    Main Menu</div>
+                <a href="{% url 'dashboard' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <span class="nav-icon">📊</span> Dashboard
+                </a>
+
+                <div class="nav-section-label"
+                    style="font-size: 11px; color: #718096; padding: 20px 0 10px; text-transform: uppercase; font-weight: 700;">
+                    Management</div>
+                <a href="{% url 'admin_users' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}">
+                    <span class="nav-icon">👥</span> User Management
+                </a>
+                <a href="{% url 'admin_moderation' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'admin_moderation' %}active{% endif %}">
+                    <span class="nav-icon">🚨</span> Moderation
+                    {% if unresolved_alerts > 0 %}
+                    <span class="badge"
+                        style="background: #E53E3E; color: white; border-radius: 6px; padding: 2px 6px; font-size: 10px; margin-left: auto;">{{
+                        unresolved_alerts }}</span>
+                    {% endif %}
+                </a>
+                <a href="{% url 'admin_cms' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'admin_cms' %}active{% endif %}">
+                    <span class="nav-icon">📁</span> Content CMS
+                </a>
+
+                <div class="nav-section-label"
+                    style="font-size: 11px; color: #718096; padding: 20px 0 10px; text-transform: uppercase; font-weight: 700;">
+                    System</div>
+                <a href="{% url 'admin_security' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'admin_security' %}active{% endif %}">
+                    <span class="nav-icon">🛡️</span> Security Logs
+                </a>
+                <a href="{% url 'admin_ai_monitor' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'admin_ai_monitor' %}active{% endif %}">
+                    <span class="nav-icon">🤖</span> AI Monitor
+                </a>
+                <a href="{% url 'settings' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+                    <span class="nav-icon">⚙️</span> Settings
+                </a>
+                <a href="{% url 'logout' %}" class="nav-item" style="color: #E53E3E; opacity: 0.8; margin-top: auto;">
+                    <span class="nav-icon">🚪</span> Logout
+                </a>
+                {% elif user.profile.role == 'THERAPIST' %}
+                <div class="nav-section-label"
+                    style="font-size: 11px; color: var(--text-muted); padding: 20px 0 10px; text-transform: uppercase; font-weight: 700;">
+                    Practice</div>
+                <a href="{% url 'dashboard' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <span class="nav-icon">👥</span> My Clients
+                </a>
+                <a href="{% url 'therapist_appointments' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'therapist_appointments' %}active{% endif %}">
+                    <span class="nav-icon">📅</span> Appointments
+                    {% if pending_appt_count > 0 %}
+                    <span
+                        style="background:#E53E3E;color:white;border-radius:6px;padding:2px 6px;font-size:10px;margin-left:auto;">{{
+                        pending_appt_count }}</span>
+                    {% endif %}
+                </a>
+                <a href="{% url 'therapist_profile' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'therapist_profile' %}active{% endif %}">
+                    <span class="nav-icon">👤</span> My Profile
+                </a>
+                <a href="{% url 'messages_list' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'messages_list' or request.resolver_match.url_name == 'chat_session' %}active{% endif %}">
+                    <span class="nav-icon">✉️</span> Messages
+                </a>
+
+                <div class="nav-section-label"
+                    style="font-size: 11px; color: var(--text-muted); padding: 20px 0 10px; text-transform: uppercase; font-weight: 700;">
+                    Clinical</div>
+                <a href="{% url 'therapist_insights' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'therapist_insights' %}active{% endif %}">
+                    <span class="nav-icon">📊</span> Insights
+                </a>
+                <a href="{% url 'therapist_crisis' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'therapist_crisis' %}active{% endif %}">
+                    <span class="nav-icon">🚨</span> Crisis Center
+                </a>
+
+                <div class="nav-section-label"
+                    style="font-size: 11px; color: var(--text-muted); padding: 20px 0 10px; text-transform: uppercase; font-weight: 700;">
+                    Account</div>
+                <a href="{% url 'settings' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+                    <span class="nav-icon">⚙️</span> Settings
+                </a>
+                <a href="{% url 'logout' %}" class="nav-item" style="color: #E53E3E; opacity: 0.8; margin-top: auto;">
+                    <span class="nav-icon">🚪</span> Logout
+                </a>
+                {% else %}
+                <a href="{% url 'dashboard' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <span class="nav-icon">🏠</span> Home
+                </a>
+                <a href="{% url 'journal' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'journal' %}active{% endif %}">
+                    <span class="nav-icon">📖</span> Journal
+                </a>
+                <a href="{% url 'mood_checkin' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'mood_checkin' %}active{% endif %}">
+                    <span class="nav-icon">😊</span> Mood Tracker
+                </a>
+                <a href="{% url 'focus_timer' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'focus_timer' %}active{% endif %}">
+                    <span class="nav-icon">⏱️</span> Focus Timer
+                </a>
+                <a href="{% url 'find_therapist' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'find_therapist' %}active{% endif %}">
+                    <span class="nav-icon">👥</span> Find Therapist
+                </a>
+                <a href="{% url 'find_resources' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'find_resources' %}active{% endif %}">
+                    <span class="nav-icon">📚</span> Resource Hub
+                </a>
+                <a href="{% url 'self_help' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'self_help' %}active{% endif %}">
+                    <span class="nav-icon">🧘</span> Self-Help Tools
+                </a>
+                <a href="{% url 'messages_list' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'messages_list' or request.resolver_match.url_name == 'chat_session' %}active{% endif %}">
+                    <span class="nav-icon">✉️</span> Messages
+                </a>
+                <a href="{% url 'ai_chat' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'ai_chat' %}active{% endif %}">
+                    <span class="nav-icon">💬</span> AI Chat
+                </a>
+                <a href="{% url 'ai_mentor' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'ai_mentor' %}active{% endif %}">
+                    <span class="nav-icon">🤖</span> AI Mentor
+                </a>
+                <a href="{% url 'settings' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+                    <span class="nav-icon">⚙️</span> Settings
+                </a>
+                <a href="{% url 'logout' %}" class="nav-item" style="color: #E53E3E; opacity: 0.8; margin-top: auto;">
+                    <span class="nav-icon">🚪</span> Logout
+                </a>
+                {% endif %}
+            </nav>
+        </aside>
+        {% endif %}
+
+        {% if not user.is_authenticated %}
+        <header class="auth-navbar" style="position: fixed; width: 100%; top: 0; left: 0; z-index: 100;">
+            <div class="logo-container" style="margin-bottom: 0;">
+                <div class="logo-icon"></div>
+                <div class="logo-text">
+                    <span class="logo-mind">Mind</span><span class="logo-bloom">Bloom</span>
+                </div>
+            </div>
+        </header>
+        {% endif %}
+
+        <!-- Main Content -->
+        <main class="main-content">
+            {% if user.is_authenticated %}
+            <header class="top-header">
+                <div class="user-greeting">Hello, {{ user.username }}</div>
+                <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+            </header>
+            {% endif %}
+
+            <div class="content-area">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+
+        {% if user.is_authenticated and user.profile.role == 'STUDENT' %}
+        <!-- Calming Sounds Player -->
+        <div class="calming-sounds">
+            <div class="sound-info">
+                <h5>Calming Sounds</h5>
+                <span>Select a track</span>
+            </div>
+            <div class="play-btn">▶</div>
+        </div>
+        {% endif %}
+    </div>
+</body>
+
+</html>

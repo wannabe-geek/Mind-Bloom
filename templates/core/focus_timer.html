@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="header-action"
+    style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <h1 class="welcome-greeting">Focus Mastery</h1>
+        <p class="welcome-subtext">Lock in your attention and bloom through deep work.</p>
+    </div>
+    <div id="deep-work-toggle"
+        style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px 20px; border-radius: 20px; border: 1px solid #eee; background: white; transition: all 0.3s;">
+        <span style="font-size: 18px;">🌙</span>
+        <span style="font-weight: 600; font-size: 14px;">Deep Work Mode</span>
+    </div>
+</div>
+
+<div id="timer-container" class="card"
+    style="max-width: 600px; margin: 0 auto; padding: 60px 40px; text-align: center; background: white; border: 1px solid #eee; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden;">
+    <!-- Active Task Display -->
+    {% if selected_task %}
+    <div id="active-task-label" style="margin-bottom: 30px; animation: fadeInDown 0.5s ease-out;">
+        <span class="profile-tag" style="background-color: #E9ECEF; color: #2D3436; font-size: 10px;">WORKING ON</span>
+        <h2 style="margin-top: 10px; font-size: 24px;">{{ selected_task.title }}</h2>
+    </div>
+    {% else %}
+    <div id="task-selector" style="margin-bottom: 40px;">
+        <p class="welcome-subtext" style="font-size: 14px; margin-bottom: 15px;">What are we focusing on?</p>
+        <select id="task-dropdown"
+            style="width: 100%; max-width: 300px; padding: 12px 15px; border-radius: 25px; border: 1px solid #ddd; outline: none; background: #fdfdfd; font-size: 14px;">
+            <option value="">Just Focusing</option>
+            {% for task in tasks %}
+            <option value="{{ task.id }}">{{ task.title }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    {% endif %}
+
+    <!-- Pomodoro Timer Controls -->
+    <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 40px;">
+        <button onclick="setTimer(25)" class="timer-mode-btn active" id="btn-25">Focus (25m)</button>
+        <button onclick="setTimer(5)" class="timer-mode-btn" id="btn-5">Break (5m)</button>
+    </div>
+
+    <!-- The Countdown -->
+    <div style="position: relative; display: inline-block; margin-bottom: 40px;">
+        <svg style="width: 250px; height: 250px; transform: rotate(-90deg);">
+            <circle cx="125" cy="125" r="110" fill="none" stroke="#f0f0f0" stroke-width="8" />
+            <circle id="timer-progress" cx="125" cy="125" r="110" fill="none" stroke="#A0C4FF" stroke-width="8"
+                stroke-dasharray="691.15" stroke-dashoffset="0" style="transition: stroke-dashoffset 1s linear;" />
+        </svg>
+        <div id="timer-display"
+            style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 64px; font-weight: 700; color: #4A6D6C;">
+            25:00
+        </div>
+    </div>
+
+    <!-- Play/Pause -->
+    <div style="display: flex; justify-content: center; gap: 20px;">
+        <button id="start-btn" onclick="toggleTimer()" class="check-in-btn"
+            style="width: 150px; font-size: 18px;">Start</button>
+        <button onclick="resetTimer()"
+            style="background: none; border: none; font-size: 24px; cursor: pointer; color: #95A5A6; opacity: 0.6; transition: opacity 0.2s;">🔄</button>
+    </div>
+
+    <!-- Deep Work Overlay -->
+    <div id="deep-work-overlay"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #FBFCFC; z-index: 1000; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.8s ease-out;">
+        <div style="text-align: center;">
+            <p
+                style="color: #A0C4FF; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px;">
+                Deep Work Mode</p>
+            <h1 id="overlay-task-title" style="font-size: 48px; margin-bottom: 40px; color: #4A6D6C;">
+                {% if selected_task %}{{ selected_task.title }}{% else %}Flow State{% endif %}
+            </h1>
+            <div id="overlay-timer" style="font-size: 120px; font-weight: 800; color: #2D3436; margin-bottom: 60px;">
+                25:00</div>
+            <button onclick="exitDeepWork()"
+                style="background: none; border: 1px solid #ddd; padding: 12px 30px; border-radius: 25px; color: #95A5A6; cursor: pointer; font-size: 14px;">Exit
+                Deep Work</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .timer-mode-btn {
+        background: #f8f9fa;
+        border: 1px solid #eee;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #7F8C8D;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .timer-mode-btn.active {
+        background: #A0C4FF;
+        color: white;
+        border-color: #A0C4FF;
+    }
+
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+</style>
+
+<script>
+    let timeLeft = 25 * 60;
+    let totalTime = 25 * 60;
+    let timerId = null;
+    let isDeepWork = false;
+
+    const display = document.getElementById('timer-display');
+    const overlayDisplay = document.getElementById('overlay-timer');
+    const progressCircle = document.getElementById('timer-progress');
+    const startBtn = document.getElementById('start-btn');
+    const deepWorkOverlay = document.getElementById('deep-work-overlay');
+    const fullSidebar = document.querySelector('.sidebar');
+
+    function updateDisplay() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        display.innerText = formattedTime;
+        overlayDisplay.innerText = formattedTime;
+
+        // Update SVG Progress
+        const percent = timeLeft / totalTime;
+        const offset = 691.15 * (1 - percent);
+        progressCircle.style.strokeDashoffset = offset;
+    }
+
+    function toggleTimer() {
+        if (timerId) {
+            clearInterval(timerId);
+            timerId = null;
+            startBtn.innerText = 'Resume';
+            startBtn.style.backgroundColor = '#4A6D6C';
+        } else {
+            startBtn.innerText = 'Pause';
+            startBtn.style.backgroundColor = '#95A5A6';
+            timerId = setInterval(() => {
+                timeLeft--;
+                updateDisplay();
+                if (timeLeft <= 0) {
+                    clearInterval(timerId);
+                    timerId = null;
+                    alert('Time to bloom! Great work.');
+                    resetTimer();
+                }
+            }, 1000);
+        }
+    }
+
+    function resetTimer() {
+        clearInterval(timerId);
+        timerId = null;
+        timeLeft = totalTime;
+        startBtn.innerText = 'Start';
+        startBtn.style.backgroundColor = 'var(--primary-teal)';
+        updateDisplay();
+    }
+
+    function setTimer(minutes) {
+        totalTime = minutes * 60;
+        resetTimer();
+        document.querySelectorAll('.timer-mode-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`btn-${minutes}`).classList.add('active');
+    }
+
+    document.getElementById('deep-work-toggle').onclick = () => {
+        isDeepWork = true;
+        deepWorkOverlay.style.display = 'flex';
+        // Handle task title in overlay
+        const dropdown = document.getElementById('task-dropdown');
+        const overlayTitle = document.getElementById('overlay-task-title');
+        if (dropdown && dropdown.value) {
+            overlayTitle.innerText = dropdown.options[dropdown.selectedIndex].text;
+        }
+    };
+
+    function exitDeepWork() {
+        isDeepWork = false;
+        deepWorkOverlay.style.display = 'none';
+    }
+
+    updateDisplay();
+</script>
+{% endblock %}

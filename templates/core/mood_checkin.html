@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="header-action">
+    <h1 class="welcome-greeting">Daily Mind Check-In</h1>
+    <p class="welcome-subtext">How are you feeling right now?</p>
+</div>
+
+<div class="card card-white" style="max-width: 600px; margin: 40px auto;">
+    <form method="post" class="checkin-form">
+        {% csrf_token %}
+        <div class="range-group">
+            <label>Mood Level (1-10)</label>
+            <input type="range" name="mood_score" min="1" max="10" value="5" class="slider"
+                oninput="this.nextElementSibling.value = this.value">
+            <output>5</output>
+        </div>
+
+        <div class="range-group">
+            <label>Energy Level (1-10)</label>
+            <input type="range" name="energy_score" min="1" max="10" value="5" class="slider"
+                oninput="this.nextElementSibling.value = this.value">
+            <output>5</output>
+        </div>
+
+        <div class="range-group">
+            <label>Stress Level (1-10)</label>
+            <input type="range" name="stress_score" min="1" max="10" value="5" class="slider"
+                oninput="this.nextElementSibling.value = this.value">
+            <output>5</output>
+        </div>
+
+        <div class="form-group" style="margin-top: 20px;">
+            <label>What's on your mind? (Optional)</label>
+            <textarea name="note" placeholder="Write a short note about your day..."></textarea>
+        </div>
+
+        <button type="submit" class="check-in-btn"
+            style="width: 100%; border: none; cursor: pointer; margin-top: 20px;">Complete Check-In</button>
+    </form>
+</div>
+
+<style>
+    .range-group {
+        margin-bottom: 30px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .range-group label {
+        margin-bottom: 10px;
+        font-weight: 500;
+        color: var(--text-muted);
+    }
+
+    .slider {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 8px;
+        border-radius: 5px;
+        background: var(--accent-gray);
+        outline: none;
+    }
+
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--primary-teal);
+        cursor: pointer;
+    }
+
+    output {
+        text-align: center;
+        font-weight: 700;
+        color: var(--primary-teal);
+        margin-top: 10px;
+        font-size: 20px;
+    }
+
+    textarea {
+        width: 100%;
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px solid var(--accent-gray);
+        min-height: 100px;
+        font-family: inherit;
+    }
+</style>
+{% endblock %}

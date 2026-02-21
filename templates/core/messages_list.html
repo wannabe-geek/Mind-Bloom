@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="header-action" style="margin-bottom: 40px;">
+    <h1 class="welcome-greeting">Messages</h1>
+    <p class="welcome-subtext">Secure communication with your connected therapist or students.</p>
+</div>
+
+<style>
+    .message-contact-link:hover {
+        background-color: #F8F9FA;
+    }
+</style>
+
+<div class="card" style="padding: 0; overflow: hidden;">
+    {% for contact in contacts %}
+    <a href="{% url 'chat_session' contact.id %}" class="message-contact-link"
+        style="display: flex; align-items: center; gap: 20px; padding: 25px; text-decoration: none; color: inherit; border-bottom: 1px solid #f0f0f0; transition: background 0.2s;">
+        <div class="profile-avatar"
+            style="--avatar-bg: {{ contact.profile.avatar_color|default:'#769891' }}; background-color: var(--avatar-bg);">
+            {{ contact.profile.get_initial }}
+        </div>
+        <div style="flex: 1;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                <h3 style="font-size: 18px;">{{ contact.username }}</h3>
+                <span class="profile-tag" style="font-size: 10px;">{{ contact.profile.role }}</span>
+            </div>
+            <p class="welcome-subtext" style="font-size: 13px;">Click to open secure chat session</p>
+        </div>
+        <div style="color: #A0C4FF; font-size: 20px;">💬</div>
+    </a>
+    {% empty %}
+    <div style="padding: 60px; text-align: center;">
+        <div style="font-size: 40px; margin-bottom: 20px;">💌</div>
+        <h3>No conversations yet.</h3>
+        <p class="welcome-subtext">Once you connect with a therapist or student, you can message them here.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

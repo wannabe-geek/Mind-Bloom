@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="header-action" style="margin-bottom: 40px;">
+    <div>
+        <h1 class="welcome-greeting" style="color: #E53E3E;">Crisis Response Center</h1>
+        <p class="welcome-subtext">Immediate intervention and risk escalation management.</p>
+    </div>
+    <div style="display: flex; gap: 12px;">
+        <div class="card"
+            style="padding: 10px 20px; border-radius: 12px; display: flex; align-items: center; gap: 10px; border: 1px solid #FED7D7; background: #FFF5F5;">
+            <span style="font-size: 20px;">🚨</span>
+            <div style="color: #C53030; font-weight: 800; font-size: 18px;">{{ active_alerts|length }} Active</div>
+        </div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+
+    <!-- Active Alerts Feed -->
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+        <div class="card" style="padding: 0; border: 1px solid #FED7D7; overflow: hidden;">
+            <div
+                style="padding: 20px 30px; background: #FFF5F5; border-bottom: 1px solid #FED7D7; display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="font-size: 15px; color: #C53030; display: flex; align-items: center; gap: 10px;">
+                    <span>🚨</span> UNRESOLVED SYSTEM ALERTS
+                </h3>
+            </div>
+
+            <div style="padding: 10px 30px;">
+                {% for alert in active_alerts %}
+                <div
+                    style="padding: 25px 0; border-bottom: 1px solid #F0F4F8; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; gap: 20px; align-items: flex-start;">
+                        <div
+                            style="width: 44px; height: 44px; border-radius: 12px; background: #FED7D7; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                            👤</div>
+                        <div>
+                            <div style="font-weight: 800; color: #2D3748; font-size: 16px;">
+                                {{ alert.student.username }}
+                            </div>
+                            <p style="font-size: 13px; color: #E53E3E; font-weight: 600; margin: 5px 0;">
+                                "{{ alert.message }}"
+                            </p>
+                            <span style="font-size: 11px; color: #A0AEC0; font-weight: 700;">
+                                RECEIVED: {{ alert.created_at|timesince }} ago
+                            </span>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <a href="{% url 'therapist_records' alert.student.id %}" class="check-in-btn"
+                            style="padding: 8px 16px; font-size: 11px; background: white; color: #4A5568; border: 1px solid #E2E8F0;">View
+                            History</a>
+                        <form method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="alert_id" value="{{ alert.id }}">
+                            <button type="submit" class="check-in-btn"
+                                style="padding: 8px 16px; font-size: 11px; background: #48BB78; border: none;">Mark
+                                Resolved</button>
+                        </form>
+                    </div>
+                </div>
+                {% empty %}
+                <div style="padding: 60px; text-align: center;">
+                    <div style="font-size: 48px; margin-bottom: 20px;">✅</div>
+                    <h3 style="color: #4A5568;">All clear</h3>
+                    <p class="welcome-subtext">No active crisis alerts detected for your students.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Escalation Placeholder -->
+        <div class="card" style="padding: 30px; border-left: 6px solid #4C51BF;">
+            <h3 style="font-size: 16px; color: #2D3748; margin-bottom: 10px;">Escalate to Admin Support</h3>
+            <p style="font-size: 14px; color: #718096; line-height: 1.6; margin-bottom: 20px;">If a student requires
+                immediate psychiatric referral or legal intervention, notify the system administrators immediately.</p>
+            <button class="check-in-btn" style="background: #4C51BF; padding: 12px 25px;">Open Escalation
+                Ticket</button>
+        </div>
+    </div>
+
+    <!-- Crisis Sidebar Tools -->
+    <div style="display: flex; flex-direction: column; gap: 30px;">
+        <div class="card" style="padding: 24px;">
+            <h3 style="font-size: 15px; color: #2D3748; margin-bottom: 15px;">Safety Plan Checklist</h3>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <label style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: #4A5568;">
+                    <input type="checkbox"> Identify Triggers
+                </label>
+                <label style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: #4A5568;">
+                    <input type="checkbox"> Coping Strategies
+                </label>
+                <label style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: #4A5568;">
+                    <input type="checkbox"> Support Contacts
+                </label>
+                <label style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: #4A5568;">
+                    <input type="checkbox"> Environment Safety
+                </label>
+                <button class="check-in-btn"
+                    style="width: 100%; border-radius: 8px; margin-top: 10px; font-size: 11px; background: white; color: #4A5568; border: 1px solid #E2E8F0;">Download
+                    Safety PDF</button>
+            </div>
+        </div>
+
+        <div class="card" style="padding: 24px; background: #F8FAFC;">
+            <h3
+                style="font-size: 14px; color: #718096; text-transform: uppercase; font-weight: 700; margin-bottom: 15px;">
+                Recently Resolved</h3>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                {% for alert in resolved_alerts %}
+                <div style="font-size: 12px; color: #A0AEC0;">
+                    <span style="font-weight: 700;">{{ alert.student.username }}</span>
+                    <br>Resolved {{ alert.created_at|date:"M d" }}
+                </div>
+                {% empty %}
+                <p class="welcome-subtext" style="font-size: 11px;">No resolved history.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

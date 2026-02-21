@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .msg-bubble {
+        max-width: 70%;
+        padding: 12px 18px;
+        border-radius: 18px;
+        font-size: 14px;
+        line-height: 1.5;
+        position: relative;
+    }
+
+    .msg-sent {
+        align-self: flex-end;
+        background-color: #A0C4FF;
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+
+    .msg-received {
+        align-self: flex-start;
+        background-color: white;
+        border: 1px solid #eee;
+        border-bottom-left-radius: 4px;
+        color: #2D3436;
+    }
+
+    .msg-time {
+        font-size: 10px;
+        margin-top: 5px;
+        opacity: 0.7;
+    }
+
+    .align-right {
+        text-align: right;
+    }
+
+    .align-left {
+        text-align: left;
+    }
+
+    .profile-avatar-chat {
+        width: 45px;
+        height: 45px;
+    }
+</style>
+
+<div class="header-action"
+    style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <div class="profile-avatar profile-avatar-chat"
+            style="--avatar-bg: {{ other_user.profile.avatar_color|default:'#769891' }}; background-color: var(--avatar-bg);">
+            {{ other_user.profile.get_initial }}
+        </div>
+        <div>
+            <h2 style="font-size: 20px;">{{ other_user.username }}</h2>
+            <p class="welcome-subtext" style="font-size: 11px;">Active Secure Session</p>
+        </div>
+    </div>
+    <a href="{% url 'messages_list' %}" class="check-in-btn"
+        style="background-color: #E9ECEF; color: #2D3436; text-decoration: none; font-size: 13px;">Back to Messages</a>
+</div>
+
+<div class="card"
+    style="height: 500px; display: flex; flex-direction: column; padding: 0; overflow: hidden; background-color: #fcfcfc;">
+    <!-- Chat Messages -->
+    <div id="chat-messages"
+        style="flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 15px;">
+        {% for msg in chat_messages %}
+        <div class="msg-bubble {% if msg.sender == request.user %}msg-sent{% else %}msg-received{% endif %}">
+            {{ msg.content }}
+            <div class="msg-time {% if msg.sender == request.user %}align-right{% else %}align-left{% endif %}">
+                {{ msg.created_at|date:"g:i A" }}
+            </div>
+        </div>
+        {% empty %}
+        <div style="text-align: center; margin-top: 50px;">
+            <p class="welcome-subtext">No messages yet. Start the conversation!</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Chat Form -->
+    <div style="padding: 20px; background-color: white; border-top: 1px solid #eee;">
+        <form method="post" style="display: flex; gap: 10px;">
+            {% csrf_token %}
+            <input type="text" name="content" placeholder="Type your message..." required
+                style="flex: 1; padding: 12px 15px; border-radius: 25px; border: 1px solid #ddd; outline: none; font-size: 14px;">
+            <button type="submit" class="check-in-btn" style="border-radius: 25px; padding: 10px 20px;">Send</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Scroll to bottom of chat
+    const chatContainer = document.getElementById('chat-messages');
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+</script>
+{% endblock %}

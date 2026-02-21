@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Moderation - Mindbloom{% endblock %}
+
+{% block content %}
+<div class="welcome-section" style="margin-bottom: 30px;">
+    <h1 class="welcome-greeting">Moderation Center</h1>
+    <p class="welcome-subtext">Crisis Oversight & Safety Protocols</p>
+</div>
+
+<div class="card" style="padding: 0; overflow: hidden; border-radius: 20px;">
+    <div style="padding: 24px; border-bottom: 1px solid #EDF2F7; background: #FFF;">
+        <h3 class="chart-title" style="margin: 0;">Active Crisis Alerts</h3>
+    </div>
+    {% if alerts %}
+    <table class="admin-table">
+        <thead style="background: #F8FAFC;">
+            <tr>
+                <th>Student</th>
+                <th>Detected At</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for alert in alerts %}
+            <tr>
+                <td style="font-weight: 600; color: #2D3748;">{{ alert.student.username }}</td>
+                <td style="color: #718096; font-size: 13px;">{{ alert.created_at|date:"M d, Y H:i" }}</td>
+                <td>
+                    <span class="profile-tag"
+                        style="background: #FFF5F5; color: #C53030; font-size: 10px; font-weight: 800;">HIGH</span>
+                </td>
+                <td>
+                    {% if alert.is_resolved %}
+                    <span class="profile-tag"
+                        style="background: #C6F6D5; color: #22543D; font-size: 10px;">RESOLVED</span>
+                    {% else %}
+                    <span class="profile-tag"
+                        style="background: #FED7D7; color: #822727; font-size: 10px;">ACTIVE</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <button class="check-in-btn"
+                        style="padding: 4px 12px; font-size: 11px; background: #E53E3E; color: white; border: none;">View
+                        Entry</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="padding: 40px; text-align: center; color: #718096;">
+        <div style="font-size: 40px; margin-bottom: 10px;">✅</div>
+        <p>No active crisis alerts. System stable.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

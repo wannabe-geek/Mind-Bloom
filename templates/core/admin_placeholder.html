@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - Mindbloom{% endblock %}
+
+{% block content %}
+<div class="welcome-section" style="margin-bottom: 30px;">
+    <h1 class="welcome-greeting">{{ title }}</h1>
+    <p class="welcome-subtext">{{ desc }}</p>
+</div>
+
+<div class="card" style="padding: 60px; text-align: center; border-radius: 20px;">
+    <div style="font-size: 64px; margin-bottom: 20px; filter: grayscale(1);">⚙️</div>
+    <h2 style="color: #2D3748; margin-bottom: 10px;">{{ title }} Implementation in Progress</h2>
+    <p style="color: #718096; max-width: 400px; margin: 0 auto;">Our engineers are finalizing the high-fidelity
+        monitoring tools for this section. Stability remains optimal across all core services.</p>
+    <div style="margin-top: 30px;">
+        <a href="{% url 'dashboard' %}" class="check-in-btn">Return to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

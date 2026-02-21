@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="auth-card">
+    <h2 class="welcome-greeting" style="font-size: 28px; margin-bottom: 5px;">Join MindBloom</h2>
+    <p class="welcome-subtext" style="font-size: 15px; margin-bottom: 25px;">Start your journey to mental clarity and
+        growth.</p>
+
+    <div class="auth-toggle">
+        <a href="{% url 'login' %}" class="toggle-btn">Login</a>
+        <a href="{% url 'register' %}" class="toggle-btn active">Register</a>
+    </div>
+
+    <form method="post" class="auth-form">
+        {% csrf_token %}
+        <div class="auth-form-group">
+            <label for="id_role">I am a...</label>
+            <select name="role" id="id_role" class="auth-select">
+                <option value="STUDENT">Student</option>
+                <option value="THERAPIST">Therapist</option>
+            </select>
+        </div>
+        {% for field in form %}
+        <div class="auth-form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% for error in field.errors %}
+            <p style="color: #E53E3E; font-size: 12px; margin-top: 5px;">{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="auth-submit-btn">Create Account</button>
+    </form>
+</div>
+{% endblock %}
