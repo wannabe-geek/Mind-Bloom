@@ -1,53 +1,74 @@
-# MindBloom - Mental Clarity & Growth Platform
+---
+title: MindBloom
+emoji: 💎
+colorFrom: indigo
+colorTo: blue
+sdk: docker
+pinned: true
+---
 
-MindBloom is a comprehensive mental health and productivity platform built with Django. It features a student portal for mood tracking and AI-guided growth, and a professional therapist portal for clinical management.
+# MindBloom: AI-Powered Mental Health Platform 💎🛡️🏛️
 
-## 🚀 Features
+**MindBloom** is a next-generation mental wellness and clinical management system. It bridges the gap between AI-driven self-reflection and professional therapeutic care, providing a secure, data-driven ecosystem for both students and healthcare providers.
 
-- **Student Portal:** Mood tracking, AI journaling, task management, and mentor personas.
-- **Therapist Portal:** Appointment scheduling, clinical notes, student wellness insights, and crisis management.
-- **Admin Dashboard:** Real-time analytics, user management, and content CMS.
-- **AI Integration:** Personalized reflections and pattern recognition powered by Google Gemini.
+## 🌟 The Portals
 
-## 🛠️ Setup Instructions
+### 🎓 Student Sanctuary
+A premium, glassmorphism-inspired space for personal growth.
+- **AI Mentorship:** Personalized reflections powered by Google Gemini (Zen, Strategist, Catalyst, and Listener personas).
+- **Daily Mood Alchemy:** Beautifully designed mood and energy tracking with trend analysis.
+- **Focus Timer:** Built-in productivity tools for mindful studying.
 
-### 1. Prerequisites
-- Python 3.13+
-- pip
+### 👩‍⚕️ Professional Therapist Portal (Vetted & SECURE)
+A secure clinical environment for approved healthcare providers.
+- **Database Accurate Insights:** Real-time engagement, retention, and crisis frequency analytics.
+- **Clinical Records:** Secure student connection management with encrypted session notes.
+- **Crisis Monitoring:** Automated alert system for proactive intervention.
+- **Approval Workflow:** Locked professional access requiring manual administrative vetting.
 
-### 2. Environment Setup
-Clone the repository and create a virtual environment:
+### 🏛️ Admin Command Center
+A high-level dashboard for platform governance.
+- **User Management:** Full control over role promotions and professional approvals.
+- **Global Analytics:** Data-driven metrics on community wellness and system growth.
+- **Security Hub:** Hard-locked professional registration to prevent unauthorized access.
+
+## 🛠️ Infrastructure & Security
+
+- **Persistent Storage:** Configured for Hugging Face official `/data` volumes, ensuring no data loss during re-deployments. 💾
+- **Invite-Only Professional Network:** All therapists must be manually promoted and approved by the site owner. 🔓
+- **Dockerized Stability:** High-availability environment optimized for Hugging Face Spaces.
+- **Security Hardening:** CSRF protection, secure cookie handling, and role-based access control (RBAC).
+
+## 🚀 Deployment (Hugging Face Spaces)
+
+1. **Enable Persistent Storage:** Go to *Settings > Persistent Storage* and select a tier (Small is recommended).
+2. **Environment Variables:**
+   - `ADMIN_USERNAME`: Your master admin user.
+   - `ADMIN_PASSWORD`: Your secure admin password.
+   - `GEMINI_API_KEY`: Your Google AI API key.
+3. **Push to HF:**
+   ```powershell
+   git push hf main
+   ```
+
+## 🛠️ Local Development
+
 ```bash
-git clone <your-repo-url>
-cd MindBloom
+# Clone & Setup
+git clone <repo-url>
 python -m venv venv
-source venv/bin/scripts/activate  # On Windows use: venv\Scripts\activate
-```
+source venv/bin/activate  # venv\Scripts\activate on Windows
 
-### 3. Install Dependencies
-```bash
+# Install & Migrate
 pip install -r requirements.txt
-```
-*(Note: Ensure you have a requirements.txt file. Create one with `pip freeze > requirements.txt` if needed.)*
-
-### 4. Configuration
-Create a `.env` file in the root directory:
-```env
-SECRET_KEY=your_django_secret_key
-DEBUG=True
-GEMINI_API_KEY=your_google_gemini_api_key
-```
-
-### 5. Database Initialization
-```bash
 python manage.py migrate
-python seed_resources.py  # If initial assets are needed
-```
 
-### 6. Run the Server
-```bash
+# Start Engine
 python manage.py runserver
 ```
 
-## 🛡️ License
-This project is for therapeutic and educational purposes only.
+## 🛡️ Ethics & Safety
+MindBloom is designed for wellness and clinical augmentation. It features automated **Crisis Detection** to flag high-risk journal entries directly to connected therapists.
+
+---
+*Developed with a focus on Privacy, Empathy, and Clinical Precision.* 💎🚀🎯
